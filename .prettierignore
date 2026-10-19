@@ -3,3 +3,4 @@ dist
 coverage
 .next
 next-env.d.ts
+packages/server/drizzle

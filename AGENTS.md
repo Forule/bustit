@@ -50,11 +50,13 @@ place backbets on other players' seats, but never on their own seat.
 │   ├── server/                 # @bustit/server: NestJS game server
 │   │   ├── src/
 │   │   │   ├── infrastructure/ # Technical concerns: config, database, logging, health
+│   │   │   ├── ledger/         # Bookings, the only way to change a balance
+│   │   │   ├── users/          # User table
 │   │   │   ├── app.module.ts
 │   │   │   └── main.ts
 │   │   ├── drizzle/            # Generated migrations, committed
 │   │   ├── drizzle.config.ts   # drizzle-kit config
-│   │   └── tests/              # Unit tests mirroring src/, e2e tests at the top level
+│   │   └── tests/              # Unit and e2e tests mirroring src/, app-wide e2e tests at the top level
 │   └── web/                    # @bustit/web: Next.js client, UI only
 │       └── src/app/
 ├── tsconfig.base.json          # Shared compiler options for engine, shared and server
@@ -109,7 +111,8 @@ place backbets on other players' seats, but never on their own seat.
   before `dev`, `typecheck`, `lint` and `test`.
 - **Tests next to `src/`, not inside it**: Each package keeps its tests in a
   `tests/` folder whose structure mirrors `src/`. Unit tests are named
-  `*.spec.ts`, end-to-end tests `*.e2e-spec.ts`. Long-running simulations are
+  `*.spec.ts` and run without any external service. Tests against Postgres
+  are named `*.e2e-spec.ts` and run through `test:e2e`. Long-running simulations are
   named `*.sim.ts` and run only through `test:sim`, not with every `test`.
   The engine's house edge simulation plays millions of hands by basic strategy
   and checks the result against the published house edge for the rules, which
@@ -138,8 +141,20 @@ place backbets on other players' seats, but never on their own seat.
   migrations are committed and never edited by hand. They are applied as a
   separate step before the server starts, never by the server itself.
 - **Real Postgres in tests**: E2e tests run against a throwaway Postgres from
-  Testcontainers instead of mocks. Local development uses the Postgres from
-  `compose.dev.yaml`.
+  Testcontainers instead of mocks, migrated with the committed migrations.
+  Local development uses the Postgres from `compose.dev.yaml`;
+  `npm run db:reset` wipes it and applies the migrations again.
+- **The ledger is the only way to change a balance**: `users.balance` caches
+  the sum of the user's ledger entries and is only changed by
+  `LedgerService.book`, in the same transaction as the entry. The balance is
+  checked and changed in one conditional `UPDATE`, so concurrent bookings
+  can't overdraw it, and a check constraint keeps it from going negative.
+  Callers that change more than the balance pass their transaction to `book`.
+- **Columns come with the feature that needs them**: Tables start with what
+  their first feature uses and grow through further migrations.
+- **Ids are UUIDv7, amounts are integers**: Primary keys default to
+  Postgres' `uuidv7()`, which sorts by creation time. Amounts are whole chips
+  stored as `bigint`.
 
 ## Coding Principles
 
@@ -173,5 +188,5 @@ place backbets on other players' seats, but never on their own seat.
   services from `compose.dev.yaml`, such as the database, and then the dev
   servers on the host. The services keep running afterwards;
   `npm run services:stop` stops them.
-- Verify changes with `npm run typecheck`, `npm run lint`, `npm run test` and
-  `npm run format` before considering a task done.
+- Verify changes with `npm run typecheck`, `npm run lint`, `npm run test`,
+  `npm run test:e2e` and `npm run format` before considering a task done.
