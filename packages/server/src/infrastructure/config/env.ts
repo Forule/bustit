@@ -7,6 +7,7 @@ export const envSchema = z.object({
     .enum(['error', 'warn', 'info', 'debug', 'verbose'])
     .default('info'),
   LOG_DIR: z.string().min(1).default('./logs'),
+  DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
 });
 
 export type Env = z.infer<typeof envSchema>;

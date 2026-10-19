@@ -9,5 +9,11 @@
     "removeComments": true,
     "types": ["node"]
   },
-  "include": ["src", "tests", "vitest.config.ts", "vitest.config.e2e.ts"]
+  "include": [
+    "src",
+    "tests",
+    "vitest.config.ts",
+    "vitest.config.e2e.ts",
+    "drizzle.config.ts"
+  ]
 }

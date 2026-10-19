@@ -28,8 +28,10 @@ place backbets on other players' seats, but never on their own seat.
 - **Monorepo**: npm workspaces
 - **Server**: NestJS 12 (ESM) with Express, winston via `nest-winston`
 - **Web**: Next.js 16 (App Router) with React 19, Tailwind CSS v4
+- **Database**: PostgreSQL 18, Drizzle ORM 0.45 with `node-postgres` via
+  `@nestjs/drizzle`, `drizzle-kit` for migrations
 - **Validation**: Zod
-- **Testing**: Vitest, Supertest
+- **Testing**: Vitest, Supertest, Testcontainers (Postgres)
 - **Tooling**: ESLint 9 (flat config per package), Prettier (repository root)
 
 ## Project Structure
@@ -47,9 +49,11 @@ place backbets on other players' seats, but never on their own seat.
 │   ├── shared/                 # @bustit/shared: Zod schemas and types for server and web
 │   ├── server/                 # @bustit/server: NestJS game server
 │   │   ├── src/
-│   │   │   ├── infrastructure/ # Technical concerns: config, logging, health
+│   │   │   ├── infrastructure/ # Technical concerns: config, database, logging, health
 │   │   │   ├── app.module.ts
 │   │   │   └── main.ts
+│   │   ├── drizzle/            # Generated migrations, committed
+│   │   ├── drizzle.config.ts   # drizzle-kit config
 │   │   └── tests/              # Unit tests mirroring src/, e2e tests at the top level
 │   └── web/                    # @bustit/web: Next.js client, UI only
 │       └── src/app/
@@ -122,6 +126,20 @@ place backbets on other players' seats, but never on their own seat.
   is attached to all log records written while handling it and is returned as
   `X-Request-Id`. The console gets readable output, and the rotated files get
   JSON.
+- **Postgres through Drizzle's query builder**: Queries use the query builder
+  and plain SQL, not the relational query API (`db.query`), which changes with
+  Drizzle 1.0. The database is injected with `@InjectDrizzle()` and typed as
+  `Database`. Tables are declared in camelCase and stored in snake_case.
+- **Tables live with their feature**: Each feature module declares its tables
+  in `*.schema.ts` files next to its code. drizzle-kit collects them by that
+  pattern.
+- **Migrations are generated, committed and run before the start**: Schema
+  changes go through `npm run db:generate -w @bustit/server`. Generated
+  migrations are committed and never edited by hand. They are applied as a
+  separate step before the server starts, never by the server itself.
+- **Real Postgres in tests**: E2e tests run against a throwaway Postgres from
+  Testcontainers instead of mocks. Local development uses the Postgres from
+  `compose.dev.yaml`.
 
 ## Coding Principles
 
@@ -151,5 +169,7 @@ place backbets on other players' seats, but never on their own seat.
   carry justifications from our conversation into the code just because they
   were convincing at the time.
 - Use npm, never pnpm or yarn.
+- Local development and e2e tests need Docker. Start the development database
+  with `npm run db:up` and stop it with `npm run db:down`.
 - Verify changes with `npm run typecheck`, `npm run lint`, `npm run test` and
   `npm run format` before considering a task done.

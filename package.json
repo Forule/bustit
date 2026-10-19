@@ -22,6 +22,8 @@
     "build": "npm run build --workspaces",
     "build:libs": "npm run build -w @bustit/engine -w @bustit/shared",
     "dev": "npm run build:libs && concurrently -n engine,shared,server,web -c gray,gray,blue,green \"npm run dev -w @bustit/engine\" \"npm run dev -w @bustit/shared\" \"npm run dev -w @bustit/server\" \"npm run dev -w @bustit/web\"",
+    "db:up": "docker compose -f compose.dev.yaml up -d --wait",
+    "db:down": "docker compose -f compose.dev.yaml down",
     "typecheck": "npm run build:libs && npm run typecheck --workspaces",
     "lint": "npm run build:libs && npm run lint --workspaces",
     "lint:fix": "npm run build:libs && npm run lint:fix --workspaces",

@@ -1,0 +1,24 @@
+# Services for local development only. Start with `npm run db:up`.
+name: bustit-dev
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: bustit
+      POSTGRES_PASSWORD: bustit
+      POSTGRES_DB: bustit
+    ports:
+      - '5432:5432'
+    volumes:
+      # Since Postgres 18 the image keeps its data below /var/lib/postgresql,
+      # in a folder per major version, instead of in /var/lib/postgresql/data.
+      - postgres:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U bustit -d bustit']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres:
