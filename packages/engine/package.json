@@ -22,7 +22,8 @@
     "lint:fix": "eslint --fix",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
-    "test:cov": "vitest run --coverage"
+    "test:cov": "vitest run --coverage",
+    "test:sim": "vitest run --config ./vitest.config.sim.ts"
   },
   "devDependencies": {
     "@eslint/js": "9.39.5",
