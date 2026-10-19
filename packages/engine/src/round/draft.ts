@@ -1,11 +1,12 @@
 import {
+  BLACKJACK,
   type Card,
   type Shoe,
   cardsRemaining,
   createShoe,
   draw,
+  evaluateHand,
 } from '../cards/index.js';
-import { evaluateHand } from '../cards/index.js';
 import type { Rng } from '../rng.js';
 import type { TableRules } from '../rules.js';
 import type {
@@ -16,8 +17,6 @@ import type {
   RoundEvent,
   RoundState,
 } from './types.js';
-
-const BLACKJACK = 21;
 
 /**
  * Mutable working copy of a round. An engine call copies the round into a

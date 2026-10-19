@@ -38,6 +38,12 @@ place backbets on other players' seats, but never on their own seat.
 .
 ├── packages/
 │   ├── engine/                 # @bustit/engine: blackjack rules as pure functions
+│   │   ├── src/
+│   │   │   ├── cards/          # Cards, hand values, shoe
+│   │   │   ├── round/          # Round flow: start, actions, dealer, settlement, queries
+│   │   │   ├── rng.ts          # Injectable, seedable randomness
+│   │   │   └── rules.ts        # Table rules, fixed rules, payout
+│   │   └── tests/              # Scenario and randomized invariant tests mirroring src/
 │   ├── shared/                 # @bustit/shared: Zod schemas and types for server and web
 │   ├── server/                 # @bustit/server: NestJS game server
 │   │   ├── src/
@@ -58,6 +64,36 @@ place backbets on other players' seats, but never on their own seat.
 - **Game rules in `@bustit/engine`**: Blackjack logic is a set of pure
   functions with an injectable RNG, free of NestJS, I/O and timers. This keeps
   the rules deterministic and testable.
+- **The engine is the dealer, the server is the casino**: The engine deals,
+  plays the dealer and settles hands. It knows stakes per hand, because
+  doubles and splits change them, but not whose money they are. A seat is just
+  an index. Users, seating, spectators, balances, the ledger, betting, timers,
+  backbets and side bets belong to the server.
+- **Backbets settle outside the engine**: A backbet has no influence on the
+  game. The server settles it with `payout`, the outcome of the seat's first
+  hand and the backbet's own flat stake.
+- **Rounds advance by decisions**: `startRound` and `applyAction` run on until
+  the next player decision, including dealing, a split hand's second card,
+  the dealer's play and the settlement. A timed-out player is sent `stand`.
+  Each call returns a new round and the events of what happened, in order.
+- **Immutable rounds as plain JSON**: Every call returns a new round and
+  never changes the one passed in. Internally a call works on a mutable
+  draft. The round holds no classes and no RNG, so it can be stored, logged
+  and replayed.
+- **Expected failures are values**: Invalid bets and actions return a
+  `Result` with an error code. Exceptions are reserved for programming errors.
+- **Nothing secret reaches clients**: Events never contain a face-down hole
+  card and can be broadcast unchanged. Snapshots for clients go through
+  `publicView`, which also drops the shoe, because its order reveals every card
+  to come. `availableActions` tells the server what an action costs before it
+  is applied, so the stake can be reserved first.
+- **Rules as data, only where variants are realistic**: `TableRules` holds what
+  may differ between tables or rounds, such as the blackjack payout or the
+  hole card rule. Rules without a realistic variant are fixed in the code and
+  listed on `TableRules`. A rule moves into `TableRules` once a feature needs
+  it.
+- **Stable hand indices**: A split appends the new hand to the seat, so hand
+  indices never shift, and hands are played in index order.
 - **Feature modules in the server**: Business features get their own folder
   directly under `src/`. Technical concerns that have no business meaning live
   in `src/infrastructure/`. There are no horizontal layers such as

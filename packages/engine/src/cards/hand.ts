@@ -1,6 +1,6 @@
 import { type Card, cardValue } from './card.js';
 
-const BLACKJACK = 21;
+export const BLACKJACK = 21;
 
 /*
  * Counting a second ace as 11 would always exceed 21, so at most one ace is
