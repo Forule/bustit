@@ -64,6 +64,25 @@ export type PlayerAction = {
   readonly type: ActionType;
 };
 
+export type AvailableAction = {
+  readonly type: ActionType;
+  /** Stake the player has to add on top of the current one, e.g. to double. */
+  readonly additionalStake: number;
+};
+
+export type AvailableActions = HandRef & {
+  readonly actions: readonly AvailableAction[];
+};
+
+/**
+ * What every client may see of a round. The shoe is reduced to the number of
+ * cards left, since its order would reveal every card to come, and a
+ * face-down hole card is left out of the dealer's cards.
+ */
+export type PublicRoundState = Omit<RoundState, 'shoe'> & {
+  readonly cardsRemaining: number;
+};
+
 /**
  * Everything that happens in a round, in the order it happens. A face-down
  * hole card never shows up in an event, so events can be broadcast to every

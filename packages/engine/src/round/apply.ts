@@ -1,5 +1,4 @@
-import { cardValue, evaluateHand } from '../cards/index.js';
-import { MAX_HANDS_PER_SEAT } from '../rules.js';
+import { evaluateHand } from '../cards/index.js';
 import {
   type Draft,
   addHand,
@@ -12,6 +11,7 @@ import {
   toDraft,
 } from './draft.js';
 import { continueRound } from './finish.js';
+import { actionNotAllowed } from './queries.js';
 import {
   type HandRef,
   type PlayerAction,
@@ -42,6 +42,12 @@ export function applyAction(
     );
   }
 
+  const notAllowed = actionNotAllowed(round, turn, action.type);
+
+  if (notAllowed) {
+    return failure('ACTION_NOT_ALLOWED', notAllowed);
+  }
+
   const draft = toDraft(round, context.rng);
 
   switch (action.type) {
@@ -52,25 +58,11 @@ export function applyAction(
       finishHand(draft, turn, 'stood');
       break;
     case 'double':
-      if (getHand(draft, turn).cards.length !== 2) {
-        return failure(
-          'ACTION_NOT_ALLOWED',
-          'A hand can only be doubled on its first two cards',
-        );
-      }
-
       double(draft, turn);
       break;
-    case 'split': {
-      const notAllowed = splitNotAllowed(draft, turn);
-
-      if (notAllowed) {
-        return failure('ACTION_NOT_ALLOWED', notAllowed);
-      }
-
+    case 'split':
       split(draft, turn);
       break;
-    }
   }
 
   return success(continueRound(draft));
@@ -87,24 +79,6 @@ function double(draft: Draft, ref: HandRef): void {
   const { bust } = evaluateHand(dealToHand(draft, ref).cards);
 
   finishHand(draft, ref, bust ? 'bust' : 'stood');
-}
-
-function splitNotAllowed(draft: Draft, ref: HandRef): string | null {
-  const [first, second, ...rest] = getHand(draft, ref).cards;
-
-  if (!first || !second || rest.length > 0) {
-    return 'A hand can only be split on its first two cards';
-  }
-
-  if (cardValue(first) !== cardValue(second)) {
-    return 'Only two cards of the same value can be split';
-  }
-
-  if (handsAtSeat(draft, ref.seat) >= MAX_HANDS_PER_SEAT) {
-    return `A seat can't play more than ${MAX_HANDS_PER_SEAT} hands`;
-  }
-
-  return null;
 }
 
 /**

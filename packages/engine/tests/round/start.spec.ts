@@ -3,7 +3,7 @@ import { createShoe } from '../../src/cards/index.js';
 import { startRound } from '../../src/round/start.js';
 import type { Bet } from '../../src/round/types.js';
 import { DEFAULT_RULES } from '../../src/rules.js';
-import { context, ranks, stackedShoe, start, unwrap } from './helpers.js';
+import { context, play, ranks, stackedShoe, start, unwrap } from './helpers.js';
 
 describe('startRound', () => {
   it('deals in casino order and hands the turn to the first seat', () => {
@@ -115,6 +115,32 @@ describe('startRound', () => {
   });
 
   describe('player blackjack', () => {
+    it('is skipped between seats that play', () => {
+      const { round, events } = play(
+        start({
+          seats: [
+            ['10', '6'],
+            ['A', 'K'],
+            ['9', '8'],
+          ],
+          dealer: ['7', '10'],
+          draws: ['2'],
+        }).round,
+        'hit',
+        'stand',
+        'stand',
+      );
+
+      expect(events.filter(({ type }) => type === 'turn')).toEqual([
+        { type: 'turn', seat: 2, hand: 0 },
+      ]);
+      expect(round.results).toEqual([
+        { seat: 0, hand: 0, outcome: 'win', stake: 10, payout: 20 },
+        { seat: 1, hand: 0, outcome: 'blackjack', stake: 10, payout: 25 },
+        { seat: 2, hand: 0, outcome: 'push', stake: 10, payout: 10 },
+      ]);
+    });
+
     it('finishes the hand right away and moves on to the next seat', () => {
       const { round, events } = start({
         seats: [

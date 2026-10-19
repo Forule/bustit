@@ -132,6 +132,24 @@ describe('settlement', () => {
   });
 
   describe('without a hole card', () => {
+    it('takes every split hand to a dealer blackjack', () => {
+      const { round } = play(
+        start(
+          { seats: [['8', '8']], dealer: ['A'], draws: ['3', '2', 'K'] },
+          { holeCard: 'none' },
+        ).round,
+        'split',
+        'stand',
+        'stand',
+      );
+
+      expect(ranks(round.dealer.cards)).toEqual(['A', 'K']);
+      expect(round.results).toEqual([
+        { seat: 0, hand: 0, outcome: 'lose', stake: 10, payout: 0 },
+        { seat: 0, hand: 1, outcome: 'lose', stake: 10, payout: 0 },
+      ]);
+    });
+
     it('takes doubled stakes to a dealer blackjack', () => {
       const { round, events } = play(
         start(
