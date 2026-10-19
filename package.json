@@ -1,0 +1,38 @@
+{
+  "name": "bustit",
+  "version": "0.1.0",
+  "description": "Multiplayer blackjack for friends.",
+  "author": {
+    "name": "Constantin Müller",
+    "email": "info@mueller-constantin.de"
+  },
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/engine",
+    "packages/shared",
+    "packages/server",
+    "packages/web"
+  ],
+  "engines": {
+    "node": ">=24",
+    "npm": ">=11"
+  },
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "build:libs": "npm run build -w @bustit/engine -w @bustit/shared",
+    "dev": "npm run build:libs && concurrently -n engine,shared,server,web -c gray,gray,blue,green \"npm run dev -w @bustit/engine\" \"npm run dev -w @bustit/shared\" \"npm run dev -w @bustit/server\" \"npm run dev -w @bustit/web\"",
+    "typecheck": "npm run build:libs && npm run typecheck --workspaces",
+    "lint": "npm run build:libs && npm run lint --workspaces",
+    "lint:fix": "npm run build:libs && npm run lint:fix --workspaces",
+    "test": "npm run build:libs && npm run test --workspaces --if-present",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write ."
+  },
+  "devDependencies": {
+    "concurrently": "10.0.6",
+    "prettier": "3.9.10",
+    "prettier-plugin-tailwindcss": "0.8.1",
+    "typescript": "6.0.3"
+  }
+}

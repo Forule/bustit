@@ -1,0 +1,52 @@
+{
+  "name": "@bustit/server",
+  "version": "0.1.0",
+  "description": "Authoritative game server for bustit.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nest build",
+    "dev": "cross-env NODE_ENV=development nest start --watch",
+    "start": "cross-env NODE_ENV=development nest start",
+    "start:debug": "cross-env NODE_ENV=development nest start --debug --watch",
+    "start:prod": "cross-env NODE_ENV=production node dist/main",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:cov": "vitest run --coverage",
+    "test:e2e": "vitest run --config ./vitest.config.e2e.ts"
+  },
+  "dependencies": {
+    "@bustit/engine": "*",
+    "@bustit/shared": "*",
+    "@nestjs/common": "12.2.0",
+    "@nestjs/config": "12.0.1",
+    "@nestjs/core": "12.2.0",
+    "@nestjs/platform-express": "12.2.0",
+    "cross-env": "10.1.0",
+    "nest-winston": "2.0.0",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2",
+    "winston": "3.19.0",
+    "winston-daily-rotate-file": "5.0.0",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "@nestjs/cli": "12.0.8",
+    "@nestjs/schematics": "12.0.7",
+    "@nestjs/testing": "12.2.0",
+    "@types/express": "5.0.6",
+    "@types/node": "24.19.2",
+    "@types/supertest": "7.2.1",
+    "eslint": "9.39.5",
+    "eslint-config-prettier": "10.1.8",
+    "globals": "17.13.0",
+    "supertest": "7.3.1",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.2",
+    "vitest": "4.1.12"
+  }
+}
