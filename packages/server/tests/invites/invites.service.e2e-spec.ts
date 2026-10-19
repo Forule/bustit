@@ -6,6 +6,8 @@ import { AppModule } from '../../src/app.module.js';
 import type { Database } from '../../src/infrastructure/database/index.js';
 import {
   InvalidInviteError,
+  InviteNotFoundError,
+  InviteUsedError,
   InvitesModule,
   InvitesService,
   hashInviteCode,
@@ -189,6 +191,125 @@ describe('InvitesService', () => {
         .from(users)
         .where(sql`${users.username} in ${usernames}`);
       expect(created).toHaveLength(1);
+    });
+  });
+
+  async function expire(inviteId: string): Promise<void> {
+    await db
+      .update(invites)
+      .set({ expiresAt: sql`now() - interval '1 second'` })
+      .where(eq(invites.id, inviteId));
+  }
+
+  describe('list', () => {
+    it('lists invites newest first with their status', async () => {
+      const open = await service.create(adminId);
+      const used = await service.create(adminId);
+      const revoked = await service.create(adminId);
+      const expired = await service.create(adminId);
+
+      await service.redeem({
+        code: used.code,
+        username: nextUsername(),
+        password: PASSWORD,
+      });
+      await service.revoke(revoked.invite.id);
+      await expire(expired.invite.id);
+
+      const ids = [open, used, revoked, expired].map(({ invite }) => invite.id);
+      const listed = (await service.list()).filter(({ id }) =>
+        ids.includes(id),
+      );
+
+      expect(listed.map(({ id, status }) => ({ id, status }))).toEqual([
+        { id: expired.invite.id, status: 'expired' },
+        { id: revoked.invite.id, status: 'revoked' },
+        { id: used.invite.id, status: 'used' },
+        { id: open.invite.id, status: 'open' },
+      ]);
+    });
+
+    it('keeps a used invite used once it expires', async () => {
+      const { invite, code } = await service.create(adminId);
+      await service.redeem({
+        code,
+        username: nextUsername(),
+        password: PASSWORD,
+      });
+      await expire(invite.id);
+
+      const listed = (await service.list()).find(({ id }) => id === invite.id);
+
+      expect(listed?.status).toBe('used');
+    });
+  });
+
+  describe('revoke', () => {
+    it('makes the code unusable', async () => {
+      const { invite, code } = await service.create(adminId);
+
+      await service.revoke(invite.id);
+
+      expect((await inviteOf(code))!.revokedAt).toBeInstanceOf(Date);
+      await expect(
+        service.redeem({ code, username: nextUsername(), password: PASSWORD }),
+      ).rejects.toThrow(InvalidInviteError);
+    });
+
+    it('keeps the first revocation when revoked again', async () => {
+      const { invite, code } = await service.create(adminId);
+      await service.revoke(invite.id);
+      const { revokedAt } = (await inviteOf(code))!;
+
+      await service.revoke(invite.id);
+
+      expect((await inviteOf(code))!.revokedAt).toEqual(revokedAt);
+    });
+
+    it('rejects a used invite', async () => {
+      const { invite, code } = await service.create(adminId);
+      await service.redeem({
+        code,
+        username: nextUsername(),
+        password: PASSWORD,
+      });
+
+      await expect(service.revoke(invite.id)).rejects.toThrow(InviteUsedError);
+      expect((await inviteOf(code))!.revokedAt).toBeNull();
+    });
+
+    it('rejects an unknown invite', async () => {
+      await expect(
+        service.revoke('00000000-0000-7000-8000-000000000000'),
+      ).rejects.toThrow(InviteNotFoundError);
+    });
+
+    it('lets either a concurrent redemption or the revocation win', async () => {
+      for (let attempt = 0; attempt < 10; attempt++) {
+        const { invite, code } = await service.create(adminId);
+
+        const [redemption, revocation] = await Promise.allSettled([
+          service.redeem({
+            code,
+            username: nextUsername(),
+            password: PASSWORD,
+          }),
+          service.revoke(invite.id),
+        ]);
+        const stored = (await inviteOf(code))!;
+
+        if (redemption.status === 'fulfilled') {
+          expect(revocation).toMatchObject({ status: 'rejected' });
+          expect((revocation as PromiseRejectedResult).reason).toBeInstanceOf(
+            InviteUsedError,
+          );
+          expect(stored.revokedAt).toBeNull();
+        } else {
+          expect(redemption.reason).toBeInstanceOf(InvalidInviteError);
+          expect(revocation.status).toBe('fulfilled');
+          expect(stored.usedAt).toBeNull();
+        }
+      }
     });
   });
 });

@@ -143,6 +143,10 @@ place backbets on other players' seats, but never on their own seat.
   changes go through `npm run db:generate -w @bustit/server`. Generated
   migrations are committed and never edited by hand. They are applied as a
   separate step before the server starts, never by the server itself.
+  Nothing runs in production yet, so for now schema changes don't get a
+  migration of their own: the migrations are regenerated into a single
+  initial one (delete `drizzle/`, generate, `npm run db:reset`). Once the
+  first production deploy exists, every change gets a new migration.
 - **Real Postgres in tests**: E2e tests run against a throwaway Postgres from
   Testcontainers instead of mocks, migrated with the committed migrations.
   Local development uses the Postgres from `compose.dev.yaml`;
@@ -169,10 +173,12 @@ place backbets on other players' seats, but never on their own seat.
   characters don't matter when typed. Redeeming locks the invite row, creates
   the account and marks the invite used in one transaction, so a code works
   once even under concurrent attempts, and a failed registration leaves it
-  valid. Unknown, used and expired codes fail alike.
+  valid. Unknown, used, revoked and expired codes fail alike. An invite's
+  status (open, used, revoked, expired) is derived in the database, so
+  expiry is judged by the same clock everywhere.
 - **Domain errors over database errors**: Expected failures such as a taken
   username or an invalid invite are thrown as domain errors
-  (`UsernameTakenError`, `InvalidInviteError`). Unique violations are
+  (`UsernameTakenError`, `InvalidInviteError`, `InviteUsedError`). Unique violations are
   translated with `isUniqueViolation` and constraints are named explicitly,
   so the translation doesn't depend on generated names.
 - **Committed env files hold random development values**: `.env.development`

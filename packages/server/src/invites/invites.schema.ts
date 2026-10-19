@@ -18,11 +18,16 @@ export const invites = pgTable(
     expiresAt: timestamp({ withTimezone: true }).notNull(),
     usedAt: timestamp({ withTimezone: true }),
     usedBy: uuid().references(() => users.id),
+    revokedAt: timestamp({ withTimezone: true }),
   },
   (table) => [
     check(
       'invites_used_at_and_by_together',
       sql`(${table.usedAt} is null) = (${table.usedBy} is null)`,
+    ),
+    check(
+      'invites_not_used_and_revoked',
+      sql`${table.usedAt} is null or ${table.revokedAt} is null`,
     ),
   ],
 );
