@@ -4,6 +4,8 @@ import { validateEnv } from '../../../src/infrastructure/config/env.js';
 const required = {
   NODE_ENV: 'test',
   DATABASE_URL: 'postgres://user:password@localhost:5432/bustit',
+  ADMIN_USERNAME: 'admin',
+  ADMIN_PASSWORD: 'admin-password',
 };
 
 describe('validateEnv', () => {
@@ -15,6 +17,12 @@ describe('validateEnv', () => {
       LOG_DIR: './logs',
       STARTING_BALANCE: 1000,
     });
+  });
+
+  it('normalizes the admin username', () => {
+    expect(
+      validateEnv({ ...required, ADMIN_USERNAME: ' Admin ' }),
+    ).toMatchObject({ ADMIN_USERNAME: 'admin' });
   });
 
   it('reads numbers from strings', () => {
@@ -32,6 +40,8 @@ describe('validateEnv', () => {
     ['a negative starting balance', { ...required, STARTING_BALANCE: '-5' }],
     ['a fractional starting balance', { ...required, STARTING_BALANCE: '1.5' }],
     ['an unknown log level', { ...required, LOG_LEVEL: 'trace' }],
+    ['an invalid admin username', { ...required, ADMIN_USERNAME: 'a b' }],
+    ['a short admin password', { ...required, ADMIN_PASSWORD: 'short' }],
   ])('rejects %s', (_, env) => {
     expect(() => validateEnv(env)).toThrow('Invalid environment configuration');
   });

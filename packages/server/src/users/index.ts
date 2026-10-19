@@ -1,1 +1,3 @@
-export { users } from './users.schema.js';
+export { UsersModule } from './users.module.js';
+export { type User, type UserRole, userRole, users } from './users.schema.js';
+export { type NewUser, UsersService } from './users.service.js';

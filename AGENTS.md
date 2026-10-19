@@ -30,6 +30,7 @@ place backbets on other players' seats, but never on their own seat.
 - **Web**: Next.js 16 (App Router) with React 19, Tailwind CSS v4
 - **Database**: PostgreSQL 18, Drizzle ORM 0.45 with `node-postgres` via
   `@nestjs/drizzle`, `drizzle-kit` for migrations
+- **Passwords**: argon2id (`argon2`)
 - **Validation**: Zod
 - **Testing**: Vitest, Supertest, Testcontainers (Postgres)
 - **Tooling**: ESLint 9 (flat config per package), Prettier (repository root)
@@ -49,6 +50,7 @@ place backbets on other players' seats, but never on their own seat.
 │   ├── shared/                 # @bustit/shared: Zod schemas and types for server and web
 │   ├── server/                 # @bustit/server: NestJS game server
 │   │   ├── src/
+│   │   │   ├── auth/           # Account creation, password hashing, admin bootstrap
 │   │   │   ├── infrastructure/ # Technical concerns: config, database, logging, health
 │   │   │   ├── ledger/         # Bookings, the only way to change a balance
 │   │   │   ├── users/          # User table
@@ -155,6 +157,15 @@ place backbets on other players' seats, but never on their own seat.
 - **Ids are UUIDv7, amounts are integers**: Primary keys default to
   Postgres' `uuidv7()`, which sorts by creation time. Amounts are whole chips
   stored as `bigint`.
+- **Accounts start with a booking**: `AccountService.create` creates the
+  user and books the starting balance in one transaction. On startup the
+  first admin is created from `ADMIN_USERNAME` and `ADMIN_PASSWORD` unless an
+  admin exists, under a Postgres advisory lock so concurrent starts can't
+  create two.
+- **Committed env files hold random development values**: `.env.development`
+  and `.env.test` are committed with random secrets that only work locally.
+  Validation is the same in every environment; real secrets are set in the
+  deployment.
 
 ## Coding Principles
 

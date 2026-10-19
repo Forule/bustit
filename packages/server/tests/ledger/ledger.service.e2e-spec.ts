@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto';
 import { getDrizzleToken } from '@nestjs/drizzle';
 import { Test, type TestingModule } from '@nestjs/testing';
 import { asc, eq, sum } from 'drizzle-orm';
@@ -35,7 +36,10 @@ describe('LedgerService', () => {
   async function createUser(): Promise<string> {
     const [user] = await db
       .insert(users)
-      .values({})
+      .values({
+        username: `u${randomBytes(6).toString('hex')}`,
+        passwordHash: 'not-used',
+      })
       .returning({ id: users.id });
     return user!.id;
   }

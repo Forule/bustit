@@ -8,6 +8,13 @@
       "when": 1792431717685,
       "tag": "0000_users_and_ledger",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792432342846,
+      "tag": "0001_user_accounts",
+      "breakpoints": true
     }
   ]
 }

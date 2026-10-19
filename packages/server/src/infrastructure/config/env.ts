@@ -1,3 +1,4 @@
+import { passwordSchema, usernameSchema } from '@bustit/shared';
 import { z } from 'zod';
 
 export const envSchema = z.object({
@@ -10,6 +11,9 @@ export const envSchema = z.object({
   DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
   /** Chips booked once to every new account. */
   STARTING_BALANCE: z.coerce.number().int().positive().default(1000),
+  /** Created as admin on startup unless an admin exists already. */
+  ADMIN_USERNAME: usernameSchema,
+  ADMIN_PASSWORD: passwordSchema,
 });
 
 export type Env = z.infer<typeof envSchema>;
