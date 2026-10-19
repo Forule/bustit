@@ -59,7 +59,7 @@ place backbets on other players' seats, but never on their own seat.
 │   │   │   └── main.ts
 │   │   ├── drizzle/            # Generated migrations, committed
 │   │   ├── drizzle.config.ts   # drizzle-kit config
-│   │   └── tests/              # Unit and e2e tests mirroring src/, app-wide e2e tests at the top level
+│   │   └── tests/              # Unit and e2e tests mirroring src/, shared test helpers in utils/
 │   └── web/                    # @bustit/web: Next.js client, UI only
 │       └── src/app/
 ├── tsconfig.base.json          # Shared compiler options for engine, shared and server
@@ -151,6 +151,16 @@ place backbets on other players' seats, but never on their own seat.
   Testcontainers instead of mocks, migrated with the committed migrations.
   Local development uses the Postgres from `compose.dev.yaml`;
   `npm run db:reset` wipes it and applies the migrations again.
+- **E2e test files run one after another on an emptied database**: They
+  share one database, so they don't run in parallel. `createTestApp()`
+  empties all tables before starting the app, whose startup then creates the
+  admin, so every file starts from the same state. Concurrency is tested
+  deliberately inside single tests, not by running files at once.
+- **Test data comes from factories, not seeds**: Tests create their data with
+  the factories in `tests/utils/`, which go through the app's services, so
+  the data always satisfies the domain rules. Each test creates its own data
+  with unique names (`uniqueUsername()`), so tests within a file don't depend
+  on each other. There are no SQL seeds or fixed data sets for tests.
 - **The ledger is the only way to change a balance**: `users.balance` caches
   the sum of the user's ledger entries and is only changed by
   `LedgerService.book`, in the same transaction as the entry. The balance is

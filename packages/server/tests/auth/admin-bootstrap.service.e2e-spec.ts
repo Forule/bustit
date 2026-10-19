@@ -1,54 +1,46 @@
 import { randomBytes } from 'node:crypto';
 import { ConfigService } from '@nestjs/config';
-import { getDrizzleToken } from '@nestjs/drizzle';
-import { Test, type TestingModule } from '@nestjs/testing';
 import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { afterAll, beforeAll, describe, expect, inject, it } from 'vitest';
-import { AppModule } from '../../src/app.module.js';
 import { AccountService } from '../../src/auth/account.service.js';
 import { AdminBootstrapService } from '../../src/auth/admin-bootstrap.service.js';
 import type { Env } from '../../src/infrastructure/config/index.js';
-import type { Database } from '../../src/infrastructure/database/index.js';
 import { LedgerService, ledger } from '../../src/ledger/index.js';
 import { UsersService, users } from '../../src/users/index.js';
+import { type TestApp, createTestApp } from '../utils/test-app.js';
 
 describe('AdminBootstrapService', () => {
-  let module: TestingModule;
-  let db: Database;
+  let app: TestApp;
   let config: ConfigService<Env, true>;
 
   beforeAll(async () => {
-    module = await Test.createTestingModule({ imports: [AppModule] }).compile();
-    module.useLogger(false);
-    await module.init();
-
-    db = module.get(getDrizzleToken());
-    config = module.get(ConfigService);
+    app = await createTestApp();
+    config = app.module.get(ConfigService);
   });
 
   afterAll(async () => {
-    await module.close();
+    await app.module.close();
   });
 
   it('creates the admin from the environment with the starting balance', async () => {
-    const [admin] = await db
+    const [admin] = await app.db
       .select()
       .from(users)
       .where(eq(users.username, config.get('ADMIN_USERNAME', { infer: true })));
 
     expect(admin).toMatchObject({ role: 'admin', balance: 1000 });
     expect(
-      await db.select().from(ledger).where(eq(ledger.userId, admin!.id)),
+      await app.db.select().from(ledger).where(eq(ledger.userId, admin!.id)),
     ).toMatchObject([{ delta: 1000, reason: 'signup_bonus' }]);
   });
 
   it('leaves an existing admin alone on the next start', async () => {
-    await module.get(AdminBootstrapService).onApplicationBootstrap();
+    await app.module.get(AdminBootstrapService).onApplicationBootstrap();
 
     expect(
-      await db.select().from(users).where(eq(users.role, 'admin')),
+      await app.db.select().from(users).where(eq(users.role, 'admin')),
     ).toHaveLength(1);
   });
 

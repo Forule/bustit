@@ -1,40 +1,27 @@
-import { getDrizzleToken } from '@nestjs/drizzle';
-import { Test, type TestingModule } from '@nestjs/testing';
 import argon2 from 'argon2';
 import { eq } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { AppModule } from '../../src/app.module.js';
 import { AccountService } from '../../src/auth/index.js';
-import type { Database } from '../../src/infrastructure/database/index.js';
 import { ledger } from '../../src/ledger/index.js';
 import { UsernameTakenError, users } from '../../src/users/index.js';
+import { TEST_PASSWORD, uniqueUsername } from '../utils/factories.js';
+import { type TestApp, createTestApp } from '../utils/test-app.js';
 
 describe('AccountService', () => {
-  let module: TestingModule;
-  let db: Database;
+  let app: TestApp;
   let service: AccountService;
-  let accountCount = 0;
 
   beforeAll(async () => {
-    module = await Test.createTestingModule({ imports: [AppModule] }).compile();
-    module.useLogger(false);
-    await module.init();
-
-    db = module.get(getDrizzleToken());
-    service = module.get(AccountService);
+    app = await createTestApp();
+    service = app.module.get(AccountService);
   });
 
   afterAll(async () => {
-    await module.close();
+    await app.module.close();
   });
 
-  /** Every test works on a username of its own. */
-  function nextUsername(): string {
-    return `account_${++accountCount}`;
-  }
-
   async function findUser(username: string) {
-    const [user] = await db
+    const [user] = await app.db
       .select()
       .from(users)
       .where(eq(users.username, username));
@@ -42,11 +29,11 @@ describe('AccountService', () => {
   }
 
   it('creates the user with a hashed password', async () => {
-    const username = nextUsername();
+    const username = uniqueUsername();
 
     const user = await service.create({
       username,
-      password: 'player-password',
+      password: TEST_PASSWORD,
       role: 'player',
     });
 
@@ -56,23 +43,23 @@ describe('AccountService', () => {
       tokenVersion: 0,
       disabledAt: null,
     });
-    expect(user.passwordHash).not.toContain('player-password');
-    await expect(
-      argon2.verify(user.passwordHash, 'player-password'),
-    ).resolves.toBe(true);
+    expect(user.passwordHash).not.toContain(TEST_PASSWORD);
+    await expect(argon2.verify(user.passwordHash, TEST_PASSWORD)).resolves.toBe(
+      true,
+    );
   });
 
   it('books the starting balance', async () => {
     const user = await service.create({
-      username: nextUsername(),
-      password: 'player-password',
+      username: uniqueUsername(),
+      password: TEST_PASSWORD,
       role: 'player',
     });
 
     expect(user.balance).toBe(1000);
     expect((await findUser(user.username))!.balance).toBe(1000);
     expect(
-      await db.select().from(ledger).where(eq(ledger.userId, user.id)),
+      await app.db.select().from(ledger).where(eq(ledger.userId, user.id)),
     ).toMatchObject([
       { delta: 1000, balanceAfter: 1000, reason: 'signup_bonus' },
     ]);
@@ -80,8 +67,8 @@ describe('AccountService', () => {
 
   it('rejects a username that is taken', async () => {
     const account = {
-      username: nextUsername(),
-      password: 'player-password',
+      username: uniqueUsername(),
+      password: TEST_PASSWORD,
       role: 'player',
     } as const;
 
@@ -94,19 +81,19 @@ describe('AccountService', () => {
     await expect(
       service.create({
         username: 'Not Normalized',
-        password: 'player-password',
+        password: TEST_PASSWORD,
         role: 'player',
       }),
     ).rejects.toThrow();
   });
 
   it('commits and rolls back together with the given transaction', async () => {
-    const username = nextUsername();
+    const username = uniqueUsername();
 
     await expect(
-      db.transaction(async (tx) => {
+      app.db.transaction(async (tx) => {
         await service.create(
-          { username, password: 'player-password', role: 'player' },
+          { username, password: TEST_PASSWORD, role: 'player' },
           tx,
         );
         throw new Error('caller failed');
