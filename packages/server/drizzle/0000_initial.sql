@@ -1,4 +1,5 @@
-CREATE TYPE "public"."ledger_reason" AS ENUM('signup_bonus', 'bet', 'backbet', 'payout', 'refund', 'daily', 'rebuy', 'admin_adjust');--> statement-breakpoint
+CREATE TYPE "public"."ledger_reason" AS ENUM('signup_bonus', 'bet', 'backbet', 'payout', 'refund', 'daily_bonus', 'rebuy', 'admin_adjust');--> statement-breakpoint
+CREATE TYPE "public"."user_role" AS ENUM('admin', 'player');--> statement-breakpoint
 CREATE TABLE "ledger" (
 	"id" uuid PRIMARY KEY DEFAULT uuidv7() NOT NULL,
 	"user_id" uuid NOT NULL,
@@ -12,9 +13,16 @@ CREATE TABLE "ledger" (
 --> statement-breakpoint
 CREATE TABLE "users" (
 	"id" uuid PRIMARY KEY DEFAULT uuidv7() NOT NULL,
+	"username" text NOT NULL,
+	"password_hash" text NOT NULL,
+	"role" "user_role" DEFAULT 'player' NOT NULL,
+	"token_version" integer DEFAULT 0 NOT NULL,
+	"disabled_at" timestamp with time zone,
 	"balance" bigint DEFAULT 0 NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	CONSTRAINT "users_balance_not_negative" CHECK ("users"."balance" >= 0)
+	CONSTRAINT "users_username_unique" UNIQUE("username"),
+	CONSTRAINT "users_balance_not_negative" CHECK ("users"."balance" >= 0),
+	CONSTRAINT "users_username_format" CHECK ("users"."username" ~ '^[a-z0-9_]{3,20}$')
 );
 --> statement-breakpoint
 ALTER TABLE "ledger" ADD CONSTRAINT "ledger_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

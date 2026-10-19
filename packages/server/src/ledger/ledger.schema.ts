@@ -11,13 +11,28 @@ import {
 } from 'drizzle-orm/pg-core';
 import { users } from '../users/index.js';
 
+/**
+ * Why a balance changed:
+ *
+ * - `signup_bonus`: credit of the starting balance when an account is created.
+ * - `bet`: debit of a stake on the user's own seat, when betting and again for
+ *   the extra stake of a double or a split.
+ * - `backbet`: debit of a stake on another player's seat.
+ * - `payout`: credit after a round is settled, stake included, for bets and
+ *   backbets alike. A lost stake gets no entry.
+ * - `refund`: credit of stakes back when a round is aborted, e.g. by a
+ *   server restart.
+ * - `daily_bonus`: credit of the daily bonus.
+ * - `rebuy`: credit of fresh chips to a user who ran out.
+ * - `admin_adjust`: correction by an admin, credit or debit.
+ */
 export const ledgerReason = pgEnum('ledger_reason', [
   'signup_bonus',
   'bet',
   'backbet',
   'payout',
   'refund',
-  'daily',
+  'daily_bonus',
   'rebuy',
   'admin_adjust',
 ]);
