@@ -1,10 +1,11 @@
 # Services for local development only. `npm run dev` starts them along with
-# the dev servers and leaves them running, `npm run db:down` stops them.
+# the dev servers and leaves them running, `npm run services:stop` stops them.
 name: bustit-dev
 
 services:
   postgres:
     image: postgres:18-alpine
+    container_name: bustit-postgres
     environment:
       POSTGRES_USER: bustit
       POSTGRES_PASSWORD: bustit

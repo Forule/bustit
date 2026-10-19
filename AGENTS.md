@@ -170,7 +170,8 @@ place backbets on other players' seats, but never on their own seat.
   were convincing at the time.
 - Use npm, never pnpm or yarn.
 - Local development and e2e tests need Docker. `npm run dev` starts the
-  development database from `compose.dev.yaml` and then the dev servers on the
-  host. The database keeps running afterwards; `npm run db:down` stops it.
+  services from `compose.dev.yaml`, such as the database, and then the dev
+  servers on the host. The services keep running afterwards;
+  `npm run services:stop` stops them.
 - Verify changes with `npm run typecheck`, `npm run lint`, `npm run test` and
   `npm run format` before considering a task done.
