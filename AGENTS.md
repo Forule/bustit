@@ -40,10 +40,11 @@ place backbets on other players' seats, but never on their own seat.
 │   ├── engine/                 # @bustit/engine: blackjack rules as pure functions
 │   ├── shared/                 # @bustit/shared: Zod schemas and types for server and web
 │   ├── server/                 # @bustit/server: NestJS game server
-│   │   └── src/
-│   │       ├── infrastructure/ # Technical concerns: config, logging, health
-│   │       ├── app.module.ts
-│   │       └── main.ts
+│   │   ├── src/
+│   │   │   ├── infrastructure/ # Technical concerns: config, logging, health
+│   │   │   ├── app.module.ts
+│   │   │   └── main.ts
+│   │   └── tests/              # Unit tests mirroring src/, e2e tests at the top level
 │   └── web/                    # @bustit/web: Next.js client, UI only
 │       └── src/app/
 ├── tsconfig.base.json          # Shared compiler options for engine, shared and server
@@ -66,6 +67,9 @@ place backbets on other players' seats, but never on their own seat.
 - **Libraries are built, not transpiled by consumers**: `engine` and `shared`
   compile to `dist/` and are consumed from there. The root scripts build them
   before `dev`, `typecheck`, `lint` and `test`.
+- **Tests next to `src/`, not inside it**: Each package keeps its tests in a
+  `tests/` folder whose structure mirrors `src/`. Unit tests are named
+  `*.spec.ts`, end-to-end tests `*.e2e-spec.ts`.
 - **ESM throughout**: All packages are `"type": "module"`. Relative imports in
   the Node packages carry the `.js` extension.
 - **Same origin for web and server**: In production, a reverse proxy routes
