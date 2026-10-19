@@ -8,6 +8,8 @@ export const envSchema = z.object({
     .default('info'),
   LOG_DIR: z.string().min(1).default('./logs'),
   DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
+  /** Chips booked once to every new account. */
+  STARTING_BALANCE: z.coerce.number().int().positive().default(1000),
 });
 
 export type Env = z.infer<typeof envSchema>;
