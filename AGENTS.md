@@ -52,6 +52,7 @@ place backbets on other players' seats, but never on their own seat.
 │   │   ├── src/
 │   │   │   ├── auth/           # Account creation, password hashing, admin bootstrap
 │   │   │   ├── infrastructure/ # Technical concerns: config, database, logging, health
+│   │   │   ├── invites/        # Invite codes and registration with them
 │   │   │   ├── ledger/         # Bookings, the only way to change a balance
 │   │   │   ├── users/          # User table
 │   │   │   ├── app.module.ts
@@ -162,6 +163,18 @@ place backbets on other players' seats, but never on their own seat.
   first admin is created from `ADMIN_USERNAME` and `ADMIN_PASSWORD` unless an
   admin exists, under a Postgres advisory lock so concurrent starts can't
   create two.
+- **Invite codes are stored hashed and redeemed atomically**: Codes look like
+  `BJ-7KQ4-M9XP-2HTV` (Crockford Base32, 60 random bits) and are stored only
+  as SHA-256 of their normalized form, so case, spaces, dashes and look-alike
+  characters don't matter when typed. Redeeming locks the invite row, creates
+  the account and marks the invite used in one transaction, so a code works
+  once even under concurrent attempts, and a failed registration leaves it
+  valid. Unknown, used and expired codes fail alike.
+- **Domain errors over database errors**: Expected failures such as a taken
+  username or an invalid invite are thrown as domain errors
+  (`UsernameTakenError`, `InvalidInviteError`). Unique violations are
+  translated with `isUniqueViolation` and constraints are named explicitly,
+  so the translation doesn't depend on generated names.
 - **Committed env files hold random development values**: `.env.development`
   and `.env.test` are committed with random secrets that only work locally.
   Validation is the same in every environment; real secrets are set in the

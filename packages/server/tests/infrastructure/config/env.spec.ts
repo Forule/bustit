@@ -16,6 +16,7 @@ describe('validateEnv', () => {
       LOG_LEVEL: 'info',
       LOG_DIR: './logs',
       STARTING_BALANCE: 1000,
+      INVITE_VALIDITY_DAYS: 7,
     });
   });
 
@@ -39,6 +40,7 @@ describe('validateEnv', () => {
     ],
     ['a negative starting balance', { ...required, STARTING_BALANCE: '-5' }],
     ['a fractional starting balance', { ...required, STARTING_BALANCE: '1.5' }],
+    ['zero invite validity days', { ...required, INVITE_VALIDITY_DAYS: '0' }],
     ['an unknown log level', { ...required, LOG_LEVEL: 'trace' }],
     ['an invalid admin username', { ...required, ADMIN_USERNAME: 'a b' }],
     ['a short admin password', { ...required, ADMIN_PASSWORD: 'short' }],

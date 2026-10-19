@@ -11,6 +11,8 @@ export const envSchema = z.object({
   DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
   /** Chips booked once to every new account. */
   STARTING_BALANCE: z.coerce.number().int().positive().default(1000),
+  /** Days an invite code can be redeemed after it was created. */
+  INVITE_VALIDITY_DAYS: z.coerce.number().int().positive().default(7),
   /** Created as admin on startup unless an admin exists already. */
   ADMIN_USERNAME: usernameSchema,
   ADMIN_PASSWORD: passwordSchema,

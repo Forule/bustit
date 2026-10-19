@@ -21,7 +21,7 @@ export const users = pgTable(
       .primaryKey()
       .default(sql`uuidv7()`),
     /** Normalized to lower case, see `usernameSchema` in `@bustit/shared`. */
-    username: text().notNull().unique(),
+    username: text().notNull().unique('users_username_unique'),
     passwordHash: text().notNull(),
     role: userRole().notNull().default('player'),
     /**

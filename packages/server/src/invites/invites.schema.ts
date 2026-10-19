@@ -1,0 +1,30 @@
+import { sql } from 'drizzle-orm';
+import { check, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { users } from '../users/index.js';
+
+/** Single-use codes that let someone create an account. */
+export const invites = pgTable(
+  'invites',
+  {
+    id: uuid()
+      .primaryKey()
+      .default(sql`uuidv7()`),
+    /** SHA-256 of the normalized code; the code itself is never stored. */
+    codeHash: text().notNull().unique('invites_code_hash_unique'),
+    createdBy: uuid()
+      .notNull()
+      .references(() => users.id),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    expiresAt: timestamp({ withTimezone: true }).notNull(),
+    usedAt: timestamp({ withTimezone: true }),
+    usedBy: uuid().references(() => users.id),
+  },
+  (table) => [
+    check(
+      'invites_used_at_and_by_together',
+      sql`(${table.usedAt} is null) = (${table.usedBy} is null)`,
+    ),
+  ],
+);
+
+export type Invite = typeof invites.$inferSelect;

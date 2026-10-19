@@ -7,7 +7,7 @@ import { AppModule } from '../../src/app.module.js';
 import { AccountService } from '../../src/auth/index.js';
 import type { Database } from '../../src/infrastructure/database/index.js';
 import { ledger } from '../../src/ledger/index.js';
-import { users } from '../../src/users/index.js';
+import { UsernameTakenError, users } from '../../src/users/index.js';
 
 describe('AccountService', () => {
   let module: TestingModule;
@@ -79,14 +79,15 @@ describe('AccountService', () => {
   });
 
   it('rejects a username that is taken', async () => {
-    const username = nextUsername();
-    const account = { username, password: 'player-password', role: 'player' };
+    const account = {
+      username: nextUsername(),
+      password: 'player-password',
+      role: 'player',
+    } as const;
 
-    await service.create({ ...account, role: 'player' });
+    await service.create(account);
 
-    await expect(
-      service.create({ ...account, role: 'player' }),
-    ).rejects.toThrow();
+    await expect(service.create(account)).rejects.toThrow(UsernameTakenError);
   });
 
   it('rejects a username the database does not accept', async () => {

@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDrizzle } from '@nestjs/drizzle';
 import { eq } from 'drizzle-orm';
-import type {
-  Database,
-  Transaction,
+import {
+  type Database,
+  type Transaction,
+  isUniqueViolation,
 } from '../infrastructure/database/index.js';
+import { UsernameTakenError } from './users.errors.js';
 import { type User, type UserRole, users } from './users.schema.js';
 
 export type NewUser = {
@@ -27,9 +29,21 @@ export class UsersService {
     return admin !== undefined;
   }
 
-  /** Creates a user with a balance of zero, see `AccountService`. */
+  /**
+   * Creates a user with a balance of zero, see `AccountService`.
+   *
+   * @throws UsernameTakenError if another user has the username.
+   */
   async create(user: NewUser, tx: Transaction): Promise<User> {
-    const [created] = await tx.insert(users).values(user).returning();
-    return created!;
+    try {
+      const [created] = await tx.insert(users).values(user).returning();
+      return created!;
+    } catch (error) {
+      if (isUniqueViolation(error, 'users_username_unique')) {
+        throw new UsernameTakenError(user.username);
+      }
+
+      throw error;
+    }
   }
 }
