@@ -5,6 +5,7 @@ import {
   createShoe,
   draw,
 } from '../cards/index.js';
+import { evaluateHand } from '../cards/index.js';
 import type { Rng } from '../rng.js';
 import type { TableRules } from '../rules.js';
 import type {
@@ -15,6 +16,8 @@ import type {
   RoundEvent,
   RoundState,
 } from './types.js';
+
+const BLACKJACK = 21;
 
 /**
  * Mutable working copy of a round. An engine call copies the round into a
@@ -75,6 +78,21 @@ export function getHand(draft: Draft, ref: HandRef): Hand {
   return hand;
 }
 
+export function handsAtSeat(draft: Draft, seat: number): number {
+  return draft.seats.find((entry) => entry.seat === seat)?.hands.length ?? 0;
+}
+
+/** Appends a hand to a seat, `ref.hand` has to be the next free index. */
+export function addHand(draft: Draft, ref: HandRef, hand: Hand): void {
+  const seat = draft.seats.find(({ seat }) => seat === ref.seat);
+
+  if (!seat || seat.hands.length !== ref.hand) {
+    throw new Error(`Can't add hand ${ref.hand} at seat ${ref.seat}`);
+  }
+
+  seat.hands.push(hand);
+}
+
 export function setHand(draft: Draft, ref: HandRef, hand: Hand): void {
   const seat = draft.seats.find(({ seat }) => seat === ref.seat);
 
@@ -111,6 +129,17 @@ export function dealToHand(draft: Draft, ref: HandRef): Hand {
   draft.events.push({ type: 'playerCard', ...ref, card });
 
   return updated;
+}
+
+/** Deals one card; reaching 21 stands automatically, since no card can help. */
+export function hitHand(draft: Draft, ref: HandRef): void {
+  const { total, bust } = evaluateHand(dealToHand(draft, ref).cards);
+
+  if (bust) {
+    finishHand(draft, ref, 'bust');
+  } else if (total === BLACKJACK) {
+    finishHand(draft, ref, 'stood');
+  }
 }
 
 export function dealToDealer(draft: Draft, faceDown = false): void {

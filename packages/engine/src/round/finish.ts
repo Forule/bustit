@@ -1,19 +1,29 @@
 import { evaluateHand, isBlackjack } from '../cards/index.js';
 import { type Outcome, payout } from '../rules.js';
-import { type Draft, advanceTurn, dealToDealer, toRound } from './draft.js';
+import {
+  type Draft,
+  advanceTurn,
+  dealToDealer,
+  getHand,
+  hitHand,
+  toRound,
+} from './draft.js';
 import type { Hand, HandResult, RoundUpdate } from './types.js';
 
 const DEALER_STANDS_ON = 17;
 
 /**
- * Moves on to the next hand in play. Once no hand is left, the dealer plays
- * and the round is settled.
+ * Moves on to the next hand in play. A hand created by a split gets its
+ * second card once it is its turn. Once no hand is left, the dealer plays and
+ * the round is settled.
  */
 export function continueRound(draft: Draft): RoundUpdate {
-  advanceTurn(draft);
+  for (advanceTurn(draft); draft.turn; advanceTurn(draft)) {
+    if (getHand(draft, draft.turn).cards.length >= 2) {
+      return { round: toRound(draft, null), events: draft.events };
+    }
 
-  if (draft.turn) {
-    return { round: toRound(draft, null), events: draft.events };
+    hitHand(draft, draft.turn);
   }
 
   playDealer(draft);

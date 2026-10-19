@@ -57,7 +57,7 @@ export type RoundState = {
   readonly results: readonly HandResult[];
 };
 
-export type ActionType = 'hit' | 'stand' | 'double';
+export type ActionType = 'hit' | 'stand' | 'double' | 'split';
 
 export type PlayerAction = {
   readonly seat: number;
@@ -76,6 +76,15 @@ export type RoundEvent =
   | { readonly type: 'holeCard' }
   | { readonly type: 'holeCardRevealed'; readonly card: Card }
   | (HandRef & { readonly type: 'double'; readonly stake: number })
+  /**
+   * The second card of the hand moves to a new hand with the same stake. New
+   * hands are always appended to the seat, so hand indices never shift.
+   */
+  | (HandRef & {
+      readonly type: 'split';
+      readonly newHand: number;
+      readonly stake: number;
+    })
   | (HandRef & {
       readonly type: 'handFinished';
       readonly status: FinishedHandStatus;
