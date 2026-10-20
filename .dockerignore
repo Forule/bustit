@@ -1,0 +1,15 @@
+**/node_modules
+**/dist
+**/.next
+**/coverage
+**/logs
+**/*.tsbuildinfo
+**/*.log
+**/.env*
+!**/.env.example
+.git
+.claude
+.vscode
+.idea
+**/Dockerfile
+.dockerignore

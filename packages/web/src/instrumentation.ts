@@ -5,5 +5,11 @@ export async function register() {
 
   const { serverEnv } = await import('./lib/server/env');
 
-  serverEnv();
+  // Next.js only logs an error thrown here and keeps serving.
+  try {
+    serverEnv();
+  } catch (error) {
+    console.error('Invalid environment configuration', error);
+    process.exit(1);
+  }
 }
