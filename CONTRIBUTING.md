@@ -149,3 +149,27 @@ request submission alone does not constitute acceptance of the CLA.
 If you do not agree to the CLA, please do not submit contributions to this project.
 
 For details, please read [CLA.md](CLA.md).
+
+## Branching and Pull Requests
+
+- **Protected `main` branch**: The `main` branch is the primary integration branch and must always remain
+  in a working, tested state. It must not contain intentionally broken or incomplete changes.
+- **No direct pushes to `main`**: All changes must be submitted through pull requests. Contributors must
+  not push commits directly to `main`.
+- **Use dedicated branches**: Create a separate branch for each feature, bug fix, refactoring or other
+  logically independent change. Do not develop features directly on `main`.
+- **Branch naming**: Use descriptive names with a category prefix, such as `feat/add-user-settings`,
+  `fix/session-validation`, `refactor/auth-service` or `docs/update-contributing-guide`.
+- **Keep branches focused**: Each branch should contain only changes related to its purpose. Avoid combining
+  unrelated work in a single branch or pull request.
+- **Keep branches up to date**: Incorporate relevant changes from `main` when necessary to resolve conflicts
+  and verify compatibility. Prefer rebasing your own feature branch or updating it from `main` according to
+  the project's workflow.
+- **Required checks**: Before a pull request can be merged, all required CI checks must pass, including
+  applicable type checks, linting, tests and formatting checks. Add or update tests for the behavior being changed.
+- **Review before merging**: Pull requests must be reviewed and meet the project's contribution requirements,
+  including CLA acceptance, before merging.
+- **Merge only working changes**: Merge a pull request only when its changes are complete, its required checks
+  pass and it does not knowingly break existing functionality.
+- **Release and versioning**: `main` represents the latest integrated development state, not necessarily the
+  latest published release. Releases and version numbers are managed separately when a version is published.
