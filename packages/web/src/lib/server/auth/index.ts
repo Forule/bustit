@@ -45,6 +45,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: 'jwt' },
   // Keeps users away from next-auth's built-in pages.
   pages: { signIn: '/login', error: '/login' },
+  cookies: {
+    sessionToken: { name: 'bustit.session' },
+    csrfToken: { name: 'bustit.csrf' },
+    callbackUrl: { name: 'bustit.callback-url' },
+  },
   providers: [
     Credentials({
       credentials: { username: {}, password: {} },
