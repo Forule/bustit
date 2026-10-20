@@ -37,3 +37,6 @@ Thumbs.db
 # Certificates
 *.pem
 *.key
+
+*storybook.log
+storybook-static

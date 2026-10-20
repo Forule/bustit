@@ -10,7 +10,9 @@
     "start": "next start",
     "typecheck": "next typegen && tsc --noEmit",
     "lint": "eslint",
-    "lint:fix": "eslint --fix"
+    "lint:fix": "eslint --fix",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@bustit/shared": "*",
@@ -30,6 +32,8 @@
     "zod": "4.6.7"
   },
   "devDependencies": {
+    "@storybook/nextjs-vite": "^10.6.3",
+    "@tailwindcss/postcss": "4.3.3",
     "@tailwindcss/turbopack": "4.3.3",
     "@types/node": "24.19.2",
     "@types/react": "19.3.0",
@@ -37,7 +41,10 @@
     "eslint": "9.39.5",
     "eslint-config-next": "16.4.2",
     "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-storybook": "^10.6.3",
+    "storybook": "^10.6.3",
     "tailwindcss": "4.3.3",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "vite": "latest"
   }
 }

@@ -4,6 +4,7 @@ import localFont from 'next/font/local';
 import { currentLocale } from '@/i18n/locale';
 import { routing } from '@/i18n/routing';
 import { Providers } from '../providers';
+
 import '../globals.css';
 
 /*

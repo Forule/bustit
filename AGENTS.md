@@ -33,6 +33,7 @@ and the checks a change has to pass. This file doesn't repeat them.
 - **Validation**: Zod
 - **Testing**: Vitest, Supertest, Testcontainers (Postgres)
 - **Tooling**: ESLint 9 (flat config per package), Prettier (repository root)
+- **Component-Development**: Storybook 10+ for component development
 
 ## Project Structure
 
