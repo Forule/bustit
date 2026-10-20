@@ -26,7 +26,9 @@
       "submit": "Sign in",
       "errors": {
         "usernameRequired": "Please enter your username.",
-        "passwordRequired": "Please enter your password."
+        "passwordRequired": "Please enter your password.",
+        "invalidCredentials": "Wrong name or password. You're not getting in like that.",
+        "unavailable": "We're closed right now. Try again later."
       }
     },
     "registerForm": {

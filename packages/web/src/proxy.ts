@@ -6,8 +6,8 @@ export const proxy = createMiddleware(routing);
 
 export const config = {
   /*
-   * Skips the API, which the dev server forwards to the game server, Next.js'
-   * own files and static files.
+   * Skips the web app's own API routes, such as next-auth's, Next.js' own
+   * files and static files.
    */
   matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
 };

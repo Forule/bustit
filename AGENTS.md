@@ -29,7 +29,8 @@ place backbets on other players' seats, but never on their own seat.
 - **Server**: NestJS 12 (ESM) with Express, winston via `nest-winston`
 - **Web**: Next.js 16 (App Router) with React 19, Tailwind CSS v4, React Aria
   Components with `tailwindcss-react-aria-components`, `tailwind-variants`,
-  Formik with Zod, `next-intl` (German and English), Lucide icons
+  Formik with Zod, `next-intl` (German and English), Lucide icons,
+  next-auth v5 for sessions, axios for calls to the game server
 - **Database**: PostgreSQL 18, Drizzle ORM 0.45 with `node-postgres` via
   `@nestjs/drizzle`, `drizzle-kit` for migrations
 - **Auth**: Stateless bearer tokens signed with `jose`, passwords hashed with
@@ -66,10 +67,14 @@ place backbets on other players' seats, but never on their own seat.
 │   │   └── tests/              # Unit and e2e tests mirroring src/, shared test helpers in utils/
 │   └── web/                    # @bustit/web: Next.js client, UI only
 │       └── src/
+│           ├── actions/        # Server Actions, the browser's only way to the game server
 │           ├── app/[locale]/   # Routes per locale; (auth) holds login and registration
+│           ├── app/api/auth/   # next-auth's endpoints
 │           ├── components/     # Atomic Design: atoms, molecules, organisms, templates
 │           ├── i18n/           # Locales, routing, typed messages, locale-aware navigation
-│           └── lib/            # Helpers, e.g. the Formik binding for Zod
+│           ├── lib/            # Helpers, e.g. the Formik binding for Zod
+│           │   └── server/     # Server-only: env, the game server's API client in api/
+│           └── auth.ts         # next-auth: session cookie with the server's token
 │       └── messages/           # Translations: de.json (reference) and en.json
 ├── tsconfig.base.json          # Shared compiler options for engine, shared and server
 └── package.json                # Workspace scripts
@@ -131,9 +136,13 @@ place backbets on other players' seats, but never on their own seat.
   catches rules that are wrong yet consistent.
 - **ESM throughout**: All packages are `"type": "module"`. Relative imports in
   the Node packages carry the `.js` extension.
-- **Same origin for web and server**: In production, a reverse proxy routes
-  `/api` to the server on the same domain as the web app. In development,
-  Next.js rewrites `/api` to the server instead. The client never needs a
+- **Browsers only talk to the web app (BFF)**: The game server's HTTP API
+  is not exposed to browsers. The web server calls it at `SERVER_URL` and
+  offers browsers only what the UI needs, as Server Actions in
+  `src/actions/`. There is no generic proxy that passes requests through:
+  each use case gets its own action, which calls one function of the server
+  API client in `src/lib/server/api/` (axios), so nothing reaches the game
+  server that the web app doesn't call on purpose. The client never needs a
   configurable API base URL.
 - **Fail fast on config**: Environment variables are validated with Zod at
   startup. Invalid config stops the boot.
@@ -279,6 +288,12 @@ place backbets on other players' seats, but never on their own seat.
   are committed under `src/app/fonts/` with their licenses and loaded with
   `next/font/local`, so no page loads from Google Fonts. Geist is the text
   font, Bebas Neue (`font-display`) the one for headings.
+- **Sessions with next-auth, token stays on the server**: Login goes
+  through next-auth's credentials provider, whose `authorize` calls the game
+  server's login. The server's token is kept in next-auth's encrypted,
+  HTTP-only session cookie and never reaches browser code: the session the
+  browser sees has the user's id, name and role only. A session ends when
+  the token it holds expires.
 - **React Aria navigates through Next.js**: A `RouterProvider` in the locale
   layout makes React Aria links use next-intl's router and puts the locale
   into their `href`, so links are written without it, e.g. `/login`.

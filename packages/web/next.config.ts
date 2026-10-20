@@ -3,7 +3,6 @@ import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
 
 const isStandalone = process.env.NEXT_OUTPUT_MODE === 'standalone';
-const isDevelopment = process.env.NODE_ENV === 'development';
 const monorepoRoot = path.join(import.meta.dirname, '..', '..');
 
 const nextConfig: NextConfig = {
@@ -21,20 +20,6 @@ const nextConfig: NextConfig = {
         as: '*.css',
       },
     },
-  },
-  /*
-   * In production the reverse proxy routes /api to the server on the same
-   * origin. Locally both run on separate ports, so the dev server forwards
-   * instead, which keeps the client code free of a configurable API base URL.
-   */
-  async rewrites() {
-    if (!isDevelopment) {
-      return [];
-    }
-
-    const serverUrl = process.env.SERVER_URL ?? 'http://localhost:8080';
-
-    return [{ source: '/api/:path*', destination: `${serverUrl}/api/:path*` }];
   },
 };
 
