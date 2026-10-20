@@ -8,6 +8,7 @@ import {
   type AuthenticatedUser,
   CurrentUser,
   Public,
+  Roles,
 } from '../../src/auth/index.js';
 import type { Env } from '../../src/infrastructure/config/index.js';
 import { users } from '../../src/users/index.js';
@@ -25,6 +26,12 @@ class ProbeController {
   @Public()
   @Get('public')
   publicRoute(): { ok: true } {
+    return { ok: true };
+  }
+
+  @Roles('admin')
+  @Get('admin')
+  adminRoute(): { ok: true } {
     return { ok: true };
   }
 }
@@ -197,6 +204,29 @@ describe('Auth (e2e)', () => {
         .where(eq(users.id, player.id));
 
       await getProtected(authorization).expect(401);
+    });
+  });
+
+  describe('roles', () => {
+    function getAdminRoute(authorization?: string) {
+      const call = request(app.http).get('/api/test/auth/admin');
+      return authorization ? call.set('Authorization', authorization) : call;
+    }
+
+    it('lets a user with the role through', async () => {
+      const token = await accessTokenOf(admin);
+
+      await getAdminRoute(`Bearer ${token}`).expect(200, { ok: true });
+    });
+
+    it('forbids a logged-in user without the role', async () => {
+      const { authorization } = await loggedInPlayer();
+
+      await getAdminRoute(authorization).expect(403);
+    });
+
+    it('still asks for a login first', async () => {
+      await getAdminRoute().expect(401);
     });
   });
 });

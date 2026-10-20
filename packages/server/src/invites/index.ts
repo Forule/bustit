@@ -12,7 +12,6 @@ export { InvitesModule } from './invites.module.js';
 export { type Invite, invites } from './invites.schema.js';
 export {
   type CreatedInvite,
-  type InviteStatus,
   type InviteWithStatus,
   InvitesService,
 } from './invites.service.js';

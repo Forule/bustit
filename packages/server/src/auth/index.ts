@@ -7,6 +7,7 @@ export {
   CurrentUser,
 } from './current-user.js';
 export { Public } from './public.js';
+export { Roles } from './roles.js';
 export {
   type Registration,
   RegistrationService,

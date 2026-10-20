@@ -1,3 +1,4 @@
+import type { InviteStatus } from '@bustit/shared';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectDrizzle } from '@nestjs/drizzle';
@@ -20,8 +21,6 @@ export type CreatedInvite = {
   /** The plain code, only available right after creating the invite. */
   readonly code: string;
 };
-
-export type InviteStatus = 'open' | 'used' | 'revoked' | 'expired';
 
 export type InviteWithStatus = Invite & { readonly status: InviteStatus };
 

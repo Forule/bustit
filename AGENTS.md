@@ -53,7 +53,7 @@ place backbets on other players' seats, but never on their own seat.
 │   │   ├── src/
 │   │   │   ├── auth/           # Accounts, login, registration, auth tokens, auth guard, admin bootstrap
 │   │   │   ├── infrastructure/ # Technical concerns: config, database, logging, health, validation
-│   │   │   ├── invites/        # Invite codes: create, list, revoke, claim
+│   │   │   ├── invites/        # Invite codes; managed in the operations console
 │   │   │   ├── ledger/         # Bookings, the only way to change a balance
 │   │   │   ├── users/          # User table and own profile (/me)
 │   │   │   ├── app.module.ts
@@ -186,6 +186,16 @@ place backbets on other players' seats, but never on their own seat.
 - **Every route requires a login unless marked `@Public()`**: A global guard
   checks the token on every request, so a new route is protected without
   anyone remembering to.
+- **Roles are checked by the same guard**: `@Roles(...)` on a controller or
+  route limits it to users with one of the roles. The guard checks it on the
+  user it just loaded for the token: 401 without a valid login, 403 without
+  the role.
+- **Management lives in the operations console (BOC)**: Routes for running
+  the game, such as managing invites, live under `/api/boc/...`, short for
+  Bustit Operations Console. The prefix names the purpose, not a role; which
+  roles may use a route is set with `@Roles`, so moderators could be given
+  parts of it later. Each feature module has its own BOC controller, e.g.
+  `invites/boc-invites.controller.ts`, instead of one module for all of them.
 - **Login reveals nothing about accounts**: Unknown users, wrong passwords and
   disabled accounts get the same answer, and unknown users are checked
   against a dummy hash so the response time doesn't tell them apart.
