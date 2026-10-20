@@ -6,7 +6,6 @@ import type { App } from 'supertest/types.js';
 import { AppModule } from '../../src/app.module.js';
 import { configureApp } from '../../src/app.setup.js';
 import type { Database } from '../../src/infrastructure/database/index.js';
-import { InvitesModule } from '../../src/invites/index.js';
 import { LedgerModule } from '../../src/ledger/index.js';
 
 export type TestApp = {
@@ -32,7 +31,7 @@ export async function createTestApp(
   options: TestAppOptions = {},
 ): Promise<TestApp> {
   const module = await Test.createTestingModule({
-    imports: [AppModule, LedgerModule, InvitesModule],
+    imports: [AppModule, LedgerModule],
     controllers: options.controllers ?? [],
   }).compile();
   const db: Database = module.get(getDrizzleToken());

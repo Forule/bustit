@@ -39,3 +39,15 @@ export const loginResponseSchema = z.object({
 });
 
 export type LoginResponse = z.infer<typeof loginResponseSchema>;
+
+/**
+ * The invite code is only bounded here; its format is checked when it is
+ * redeemed, so a mistyped code fails like an unknown one.
+ */
+export const registerRequestSchema = z.object({
+  inviteCode: z.string().trim().min(1).max(64),
+  username: usernameSchema,
+  password: passwordSchema,
+});
+
+export type RegisterRequest = z.infer<typeof registerRequestSchema>;

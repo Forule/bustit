@@ -8,7 +8,7 @@ import { InjectDrizzle } from '@nestjs/drizzle';
 import { sql } from 'drizzle-orm';
 import type { Env } from '../infrastructure/config/index.js';
 import type { Database } from '../infrastructure/database/index.js';
-import { UsersService } from '../users/users.service.js';
+import { UsersService } from '../users/index.js';
 import { AccountService } from './account.service.js';
 
 /**

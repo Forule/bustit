@@ -1,6 +1,7 @@
 import { randomBytes } from 'node:crypto';
 import { eq } from 'drizzle-orm';
-import { AccountService } from '../../src/auth/index.js';
+import { AccountService, AuthTokenService } from '../../src/auth/index.js';
+import { type CreatedInvite, InvitesService } from '../../src/invites/index.js';
 import { type User, users } from '../../src/users/index.js';
 import type { TestApp } from './test-app.js';
 
@@ -40,4 +41,22 @@ export async function getAdmin(app: TestApp): Promise<User> {
   }
 
   return admin;
+}
+
+/**
+ * An `Authorization` header value for the user, issued like at login, so
+ * tests of other routes don't have to log in over HTTP first.
+ */
+export async function authorizationFor(
+  app: TestApp,
+  user: Pick<User, 'id' | 'tokenVersion'>,
+): Promise<string> {
+  const { token } = await app.get(AuthTokenService).createToken(user);
+  return `Bearer ${token}`;
+}
+
+/** An open invite created by the admin, with its plain code. */
+export async function createInvite(app: TestApp): Promise<CreatedInvite> {
+  const admin = await getAdmin(app);
+  return app.get(InvitesService).create(admin.id);
 }

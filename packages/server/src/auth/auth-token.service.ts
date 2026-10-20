@@ -1,8 +1,9 @@
+import type { LoginResponse } from '@bustit/shared';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SignJWT, jwtVerify } from 'jose';
 import type { Env } from '../infrastructure/config/index.js';
-import type { User } from '../users/index.js';
+import { type User, toUserProfile } from '../users/index.js';
 
 const VALIDITY_DAYS = 30;
 const ALGORITHM = 'HS256';
@@ -48,6 +49,17 @@ export class AuthTokenService {
       .sign(this.secret);
 
     return { token, expiresAt };
+  }
+
+  /** What a client gets on login: a fresh token and the user's profile. */
+  async loginResponseFor(user: User): Promise<LoginResponse> {
+    const { token, expiresAt } = await this.createToken(user);
+
+    return {
+      accessToken: token,
+      expiresAt: expiresAt.toISOString(),
+      user: toUserProfile(user),
+    };
   }
 
   /** Returns `null` for a token that is invalid, expired or malformed. */

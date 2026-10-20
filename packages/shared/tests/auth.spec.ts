@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   loginRequestSchema,
   passwordSchema,
+  registerRequestSchema,
   usernameSchema,
 } from '../src/auth.js';
 
@@ -40,5 +41,29 @@ describe('loginRequestSchema', () => {
     expect(loginRequestSchema.safeParse({ username: 'admin' }).success).toBe(
       false,
     );
+  });
+});
+
+describe('registerRequestSchema', () => {
+  const valid = {
+    inviteCode: ' BJ-7KQ4-M9XP-2HTV ',
+    username: ' New_Player ',
+    password: 'long enough password',
+  };
+
+  it('normalizes username and invite code', () => {
+    expect(registerRequestSchema.parse(valid)).toEqual({
+      inviteCode: 'BJ-7KQ4-M9XP-2HTV',
+      username: 'new_player',
+      password: 'long enough password',
+    });
+  });
+
+  it.each([
+    ['an empty invite code', { ...valid, inviteCode: '  ' }],
+    ['an invalid username', { ...valid, username: 'a b' }],
+    ['a short password', { ...valid, password: 'short' }],
+  ])('rejects %s', (_, request) => {
+    expect(registerRequestSchema.safeParse(request).success).toBe(false);
   });
 });

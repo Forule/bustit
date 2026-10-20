@@ -44,17 +44,6 @@ export class AuthController {
       throw new UnauthorizedException('Invalid username or password');
     }
 
-    const { token, expiresAt } = await this.authTokenService.createToken(user);
-
-    return {
-      accessToken: token,
-      expiresAt: expiresAt.toISOString(),
-      user: {
-        id: user.id,
-        username: user.username,
-        role: user.role,
-        balance: user.balance,
-      },
-    };
+    return this.authTokenService.loginResponseFor(user);
   }
 }

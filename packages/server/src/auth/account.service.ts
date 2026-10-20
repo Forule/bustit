@@ -7,8 +7,7 @@ import type {
   Transaction,
 } from '../infrastructure/database/index.js';
 import { LedgerService } from '../ledger/index.js';
-import type { User, UserRole } from '../users/users.schema.js';
-import { UsersService } from '../users/users.service.js';
+import { type User, type UserRole, UsersService } from '../users/index.js';
 import { hashPassword } from './password.js';
 
 export type NewAccount = {

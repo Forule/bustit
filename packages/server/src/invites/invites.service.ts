@@ -2,10 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectDrizzle } from '@nestjs/drizzle';
 import { and, desc, eq, getTableColumns, gt, isNull, sql } from 'drizzle-orm';
-import { AccountService } from '../auth/index.js';
 import type { Env } from '../infrastructure/config/index.js';
-import type { Database } from '../infrastructure/database/index.js';
-import type { User } from '../users/index.js';
+import type {
+  Database,
+  Transaction,
+} from '../infrastructure/database/index.js';
 import { generateInviteCode, hashInviteCode } from './invite-code.js';
 import {
   InvalidInviteError,
@@ -26,7 +27,7 @@ export type InviteWithStatus = Invite & { readonly status: InviteStatus };
 
 /*
  * Derived in the database, so "expired" is judged by the same clock as in
- * redeem. A used invite stays used once it expires.
+ * claim. A used invite stays used once it expires.
  */
 const status = sql<InviteStatus>`case
   when ${invites.usedAt} is not null then 'used'
@@ -35,21 +36,12 @@ const status = sql<InviteStatus>`case
   else 'open'
 end`;
 
-export type Registration = {
-  /** As typed by the user, see `normalizeInviteCode`. */
-  readonly code: string;
-  /** Already normalized, see `usernameSchema` in `@bustit/shared`. */
-  readonly username: string;
-  readonly password: string;
-};
-
 @Injectable()
 export class InvitesService {
   private readonly validityDays: number;
 
   constructor(
     @InjectDrizzle() private readonly db: Database,
-    private readonly accountService: AccountService,
     configService: ConfigService<Env, true>,
   ) {
     this.validityDays = configService.get('INVITE_VALIDITY_DAYS', {
@@ -83,12 +75,12 @@ export class InvitesService {
    * Makes an invite unusable. Revoking it again keeps the first revocation.
    *
    * @throws InviteNotFoundError if there is no invite with the id.
-   * @throws InviteUsedError if the invite was redeemed already.
+   * @throws InviteUsedError if the invite was used already.
    */
   async revoke(id: string): Promise<void> {
     /*
-     * A concurrent redemption holds the row lock, so this update waits for it
-     * and then finds the invite used.
+     * A concurrent claim holds the row lock, so this update waits for it and
+     * then finds the invite used.
      */
     const [revoked] = await this.db
       .update(invites)
@@ -109,51 +101,46 @@ export class InvitesService {
   }
 
   /**
-   * Creates a player account and uses up the invite in one transaction, so a
-   * failed registration, e.g. for a taken username, leaves the invite valid.
+   * Finds the open invite for a code as typed by a user and locks it until
+   * `tx` ends, so the caller can use it up with `markUsed` in the same
+   * transaction. Concurrent claims of one code wait for each other; once the
+   * first commits, Postgres checks the conditions again for the waiting
+   * ones, which then find the invite used. The same applies to a concurrent
+   * revocation.
    *
    * @throws InvalidInviteError if the code is unknown, used, revoked or
    *   expired.
-   * @throws UsernameTakenError if another user has the username.
    */
-  async redeem(registration: Registration): Promise<User> {
-    const { code, username, password } = registration;
+  async claim(code: string, tx: Transaction): Promise<Pick<Invite, 'id'>> {
+    const [invite] = await tx
+      .select({ id: invites.id })
+      .from(invites)
+      .where(
+        and(
+          eq(invites.codeHash, hashInviteCode(code)),
+          isNull(invites.usedAt),
+          isNull(invites.revokedAt),
+          gt(invites.expiresAt, sql`now()`),
+        ),
+      )
+      .for('update');
 
-    return this.db.transaction(async (tx) => {
-      /*
-       * The row lock makes concurrent redemptions of one code wait for each
-       * other. Once the first commits, Postgres checks the conditions again
-       * for the waiting ones, which then find the invite used. The same
-       * applies to a concurrent revocation.
-       */
-      const [invite] = await tx
-        .select({ id: invites.id })
-        .from(invites)
-        .where(
-          and(
-            eq(invites.codeHash, hashInviteCode(code)),
-            isNull(invites.usedAt),
-            isNull(invites.revokedAt),
-            gt(invites.expiresAt, sql`now()`),
-          ),
-        )
-        .for('update');
+    if (!invite) {
+      throw new InvalidInviteError();
+    }
 
-      if (!invite) {
-        throw new InvalidInviteError();
-      }
+    return invite;
+  }
 
-      const user = await this.accountService.create(
-        { username, password, role: 'player' },
-        tx,
-      );
-
-      await tx
-        .update(invites)
-        .set({ usedAt: sql`now()`, usedBy: user.id })
-        .where(eq(invites.id, invite.id));
-
-      return user;
-    });
+  /** Uses up an invite claimed in the same transaction. */
+  async markUsed(
+    inviteId: string,
+    usedBy: string,
+    tx: Transaction,
+  ): Promise<void> {
+    await tx
+      .update(invites)
+      .set({ usedAt: sql`now()`, usedBy })
+      .where(eq(invites.id, inviteId));
   }
 }

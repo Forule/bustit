@@ -51,11 +51,11 @@ place backbets on other players' seats, but never on their own seat.
 │   ├── shared/                 # @bustit/shared: Zod schemas and types for server and web
 │   ├── server/                 # @bustit/server: NestJS game server
 │   │   ├── src/
-│   │   │   ├── auth/           # Login, auth tokens, auth guard, accounts, admin bootstrap
+│   │   │   ├── auth/           # Accounts, login, registration, auth tokens, auth guard, admin bootstrap
 │   │   │   ├── infrastructure/ # Technical concerns: config, database, logging, health, validation
-│   │   │   ├── invites/        # Invite codes and registration with them
+│   │   │   ├── invites/        # Invite codes: create, list, revoke, claim
 │   │   │   ├── ledger/         # Bookings, the only way to change a balance
-│   │   │   ├── users/          # User table
+│   │   │   ├── users/          # User table and own profile (/me)
 │   │   │   ├── app.module.ts
 │   │   │   ├── app.setup.ts    # App setup shared by main.ts and the e2e tests
 │   │   │   └── main.ts
@@ -189,9 +189,16 @@ place backbets on other players' seats, but never on their own seat.
 - **Login reveals nothing about accounts**: Unknown users, wrong passwords and
   disabled accounts get the same answer, and unknown users are checked
   against a dummy hash so the response time doesn't tell them apart.
+- **Domain errors become HTTP errors in the controller**: Services throw
+  domain errors; the controller that calls them maps the expected ones to a
+  status, e.g. an invalid invite to 400 and a taken username to 409.
 - **Request bodies are validated with the shared schemas**: Controllers parse
   input with `ZodValidationPipe` and the Zod schemas from `@bustit/shared`,
   which the web client uses as well.
+- **Modules depend in one direction**: `ledger` and `invites` build on
+  `users`, and `auth` builds on all three. `invites` only manages invites and
+  knows nothing about accounts; `auth` creates accounts and puts the steps of
+  a registration together.
 - **Accounts start with a booking**: `AccountService.create` creates the
   user and books the starting balance in one transaction. On startup the
   first admin is created from `ADMIN_USERNAME` and `ADMIN_PASSWORD` unless an
@@ -200,12 +207,14 @@ place backbets on other players' seats, but never on their own seat.
 - **Invite codes are stored hashed and redeemed atomically**: Codes look like
   `BJ-7KQ4-M9XP-2HTV` (Crockford Base32, 60 random bits) and are stored only
   as SHA-256 of their normalized form, so case, spaces, dashes and look-alike
-  characters don't matter when typed. Redeeming locks the invite row, creates
-  the account and marks the invite used in one transaction, so a code works
-  once even under concurrent attempts, and a failed registration leaves it
-  valid. Unknown, used, revoked and expired codes fail alike. An invite's
-  status (open, used, revoked, expired) is derived in the database, so
-  expiry is judged by the same clock everywhere.
+  characters don't matter when typed. `RegistrationService` claims the invite
+  (locking its row), creates the account and marks the invite used in one
+  transaction, so a code works once even under concurrent attempts, and a
+  failed registration leaves it valid. Unknown, used, revoked and expired
+  codes fail alike. An invite's status (open, used, revoked, expired) is
+  derived in the database, so expiry is judged by the same clock everywhere.
+  `POST /api/auth/register` registers and logs the new user in like a login
+  does.
 - **Domain errors over database errors**: Expected failures such as a taken
   username or an invalid invite are thrown as domain errors
   (`UsernameTakenError`, `InvalidInviteError`, `InviteUsedError`). Unique violations are

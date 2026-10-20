@@ -15,5 +15,4 @@ export {
   type InviteStatus,
   type InviteWithStatus,
   InvitesService,
-  type Registration,
 } from './invites.service.js';
