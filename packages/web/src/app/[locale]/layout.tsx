@@ -1,19 +1,28 @@
 import type { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
-import { Geist, Geist_Mono } from 'next/font/google';
+import localFont from 'next/font/local';
 import { currentLocale } from '@/i18n/locale';
 import { routing } from '@/i18n/routing';
 import { Providers } from '../providers';
 import '../globals.css';
 
-const geistSans = Geist({
+/*
+ * Fonts are committed to the repository with their licenses, so pages never
+ * load anything from Google Fonts.
+ */
+const geistSans = localFont({
+  src: '../fonts/geist/Geist-Variable.ttf',
   variable: '--font-geist-sans',
-  subsets: ['latin'],
 });
 
-const geistMono = Geist_Mono({
+const geistMono = localFont({
+  src: '../fonts/geist-mono/GeistMono-Variable.ttf',
   variable: '--font-geist-mono',
-  subsets: ['latin'],
+});
+
+const bebasNeue = localFont({
+  src: '../fonts/bebas-neue/BebasNeue-Regular.ttf',
+  variable: '--font-bebas-neue',
 });
 
 /*
@@ -37,7 +46,7 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${bebasNeue.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col font-sans">
         <NextIntlClientProvider>

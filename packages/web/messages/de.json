@@ -4,8 +4,8 @@
       "seo": {
         "title": "Anmelden"
       },
-      "title": "Willkommen zurück",
-      "description": "Melde dich mit deinem Konto an.",
+      "title": "Wer bist du?",
+      "description": "Kein Name, kein Einlass.",
       "noAccount": "Noch kein Konto?",
       "toRegister": "Mit Einladung registrieren"
     },
@@ -13,8 +13,8 @@
       "seo": {
         "title": "Registrieren"
       },
-      "title": "Konto erstellen",
-      "description": "Die Registrierung ist nur mit Einladung möglich.",
+      "title": "Neu hier?",
+      "description": "Nur mit Einladung. Keine Ausnahmen.",
       "hasAccount": "Schon dabei?",
       "toLogin": "Anmelden"
     }

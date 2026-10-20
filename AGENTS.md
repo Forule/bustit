@@ -272,8 +272,13 @@ place backbets on other players' seats, but never on their own seat.
   navigations instant under Cache Components, and next-intl picks it up in
   `i18n/request.ts` without `setRequestLocale`.
 - **Discreet entry pages**: Login and registration don't reveal what they
-  belong to: no name or logo, no page description, neutral texts, and
-  `noindex` for search engines.
+  belong to: no name or logo, no page description, texts that say nothing
+  about the purpose, and `noindex` for search engines. The texts speak like a
+  bouncer at a back door, in keeping with the alley scenes behind the forms.
+- **Dark only, fonts in the repository**: There is no light theme. Fonts
+  are committed under `src/app/fonts/` with their licenses and loaded with
+  `next/font/local`, so no page loads from Google Fonts. Geist is the text
+  font, Bebas Neue (`font-display`) the one for headings.
 - **React Aria navigates through Next.js**: A `RouterProvider` in the locale
   layout makes React Aria links use next-intl's router and puts the locale
   into their `href`, so links are written without it, e.g. `/login`.

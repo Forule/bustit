@@ -4,8 +4,8 @@
       "seo": {
         "title": "Sign in"
       },
-      "title": "Welcome back",
-      "description": "Sign in with your account.",
+      "title": "Who are you?",
+      "description": "No name, no entry.",
       "noAccount": "No account yet?",
       "toRegister": "Sign up with an invite"
     },
@@ -13,8 +13,8 @@
       "seo": {
         "title": "Sign up"
       },
-      "title": "Create an account",
-      "description": "Signing up is by invitation only.",
+      "title": "New here?",
+      "description": "Invite only. No exceptions.",
       "hasAccount": "Already in?",
       "toLogin": "Sign in"
     }
