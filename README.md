@@ -16,6 +16,7 @@
 
 - [Introduction](#introduction)
 - [Features](#features)
+- [Packages](#packages)
 - [Development](#development)
   - [Database](#database)
   - [Checks](#checks)
@@ -44,6 +45,17 @@ signing up and logging in exist.
 - A balance of play chips that every bet, win and loss is booked against, with a starting balance
   for new players
 - German and English
+
+## Packages
+
+| Package                               | Description                                                      |
+| ------------------------------------- | ---------------------------------------------------------------- |
+| [`@bustit/engine`](./packages/engine) | The blackjack rules as pure functions                            |
+| [`@bustit/shared`](./packages/shared) | Schemas and types shared between the game server and the web app |
+| [`@bustit/server`](./packages/server) | The authoritative game server                                    |
+| [`@bustit/web`](./packages/web)       | The browser client                                               |
+
+The game server and the web app document their configuration in their own `docs/configuration.md`.
 
 ## Development
 
