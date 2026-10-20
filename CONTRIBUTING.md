@@ -134,3 +134,18 @@ go into a commit of their own.
   test meaningful behavior, important edge cases and failure conditions.
 - **Run required checks**: Run the checks defined in `CONTRIBUTING.md` before considering a task complete
   or requesting review.
+
+## Contributor License Agreement (CLA)
+
+Before a pull request can be merged, contributors must agree to the project's [Contributor License Agreement (CLA)](CLA.md).
+
+By agreeing to the CLA, you grant the Project Owner the rights described in that agreement, including the rights to
+use, modify, distribute, sublicense, and relicense your contributions, including for commercial and proprietary
+purposes. You retain ownership of your contributions.
+
+Contributions will only be accepted after the required CLA agreement has been completed and verified. A pull
+request submission alone does not constitute acceptance of the CLA.
+
+If you do not agree to the CLA, please do not submit contributions to this project.
+
+For details, please read [CLA.md](CLA.md).
