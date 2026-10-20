@@ -27,7 +27,9 @@ place backbets on other players' seats, but never on their own seat.
 - **Runtime**: Node.js 24+, TypeScript 6
 - **Monorepo**: npm workspaces
 - **Server**: NestJS 12 (ESM) with Express, winston via `nest-winston`
-- **Web**: Next.js 16 (App Router) with React 19, Tailwind CSS v4
+- **Web**: Next.js 16 (App Router) with React 19, Tailwind CSS v4, React Aria
+  Components with `tailwindcss-react-aria-components`, `tailwind-variants`,
+  Formik with Zod, Lucide icons
 - **Database**: PostgreSQL 18, Drizzle ORM 0.45 with `node-postgres` via
   `@nestjs/drizzle`, `drizzle-kit` for migrations
 - **Auth**: Stateless bearer tokens signed with `jose`, passwords hashed with
@@ -63,7 +65,10 @@ place backbets on other players' seats, but never on their own seat.
 │   │   ├── drizzle.config.ts   # drizzle-kit config
 │   │   └── tests/              # Unit and e2e tests mirroring src/, shared test helpers in utils/
 │   └── web/                    # @bustit/web: Next.js client, UI only
-│       └── src/app/
+│       └── src/
+│           ├── app/            # Routes; (auth) holds login and registration
+│           ├── components/     # Atomic Design: atoms, molecules, organisms, templates
+│           └── lib/            # Helpers, e.g. the Formik binding for Zod
 ├── tsconfig.base.json          # Shared compiler options for engine, shared and server
 └── package.json                # Workspace scripts
 ```
@@ -234,6 +239,30 @@ place backbets on other players' seats, but never on their own seat.
   and `.env.test` are committed with random secrets that only work locally.
   Validation is the same in every environment; real secrets are set in the
   deployment.
+
+### Web
+
+- **Atomic Design with React Aria**: Components follow tarvello's structure.
+  Atoms wrap React Aria Components with the theme's styling; everything above
+  is built from atoms instead of styling React Aria primitives directly.
+  Component files are named in PascalCase.
+- **Theme via tokens**: Colors, radii and shadows are CSS variables in
+  `globals.css`, exposed to Tailwind. Components use only these tokens, never
+  raw palette colors. The primary color is casino felt green (`#15803d`),
+  the destructive color the red of the red suits (`#ef4444`).
+- **Forms with Formik and Zod**: Forms validate with Zod schemas through
+  `zodValidate` and bind fields with `textFieldProps` from `lib/formik.ts`.
+  Errors show once a field was left or the form was submitted. Form schemas
+  apply the rules from `@bustit/shared` (e.g. `USERNAME_PATTERN`,
+  `PASSWORD_MIN_LENGTH`) with messages of their own, so rules aren't
+  duplicated but the API's messages don't reach users.
+- **German UI**: The interface is in German. There is no translation layer
+  yet.
+- **Discreet entry pages**: Login and registration don't reveal what they
+  belong to: no name or logo, no page description, neutral texts, and
+  `noindex` for search engines.
+- **React Aria navigates through Next.js**: A `RouterProvider` in the root
+  layout makes React Aria links use the Next.js router.
 
 ## Coding Principles
 

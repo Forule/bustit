@@ -1,6 +1,21 @@
 import { z } from 'zod';
 import { userProfileSchema } from './users.js';
 
+/*
+ * The rules are exported on their own as well, so forms can apply them with
+ * messages of their own.
+ */
+
+/** Matched against the username after trimming and lowercasing it. */
+export const USERNAME_PATTERN = /^[a-z0-9_]{3,20}$/;
+
+/*
+ * Length is the only password rule, as complexity rules don't make passwords
+ * safer. The upper bound keeps hashing a request cheap.
+ */
+export const PASSWORD_MIN_LENGTH = 10;
+export const PASSWORD_MAX_LENGTH = 256;
+
 /**
  * Usernames are compared case-insensitively, so they are stored in lower case.
  */
@@ -9,15 +24,14 @@ export const usernameSchema = z
   .trim()
   .toLowerCase()
   .regex(
-    /^[a-z0-9_]{3,20}$/,
+    USERNAME_PATTERN,
     'Use 3 to 20 characters: letters, digits and underscores',
   );
 
-/*
- * Length is the only rule, as complexity rules don't make passwords safer.
- * The upper bound keeps hashing a request cheap.
- */
-export const passwordSchema = z.string().min(10).max(256);
+export const passwordSchema = z
+  .string()
+  .min(PASSWORD_MIN_LENGTH)
+  .max(PASSWORD_MAX_LENGTH);
 
 /**
  * Login only normalizes the username instead of validating it, so a wrong one

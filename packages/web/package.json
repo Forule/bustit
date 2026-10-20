@@ -13,9 +13,17 @@
     "lint:fix": "eslint --fix"
   },
   "dependencies": {
+    "@bustit/shared": "*",
+    "formik": "2.4.9",
+    "lucide-react": "1.60.0",
     "next": "16.4.2",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-aria-components": "1.22.1",
+    "react-dom": "19.3.0",
+    "tailwind-merge": "3.7.0",
+    "tailwind-variants": "3.3.1",
+    "tailwindcss-react-aria-components": "2.2.0",
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "4.3.3",

@@ -1,22 +1,67 @@
 @import 'tailwindcss';
+@plugin 'tailwindcss-react-aria-components';
 
+/*
+ * Design tokens. Components use only these, never raw palette colors, so the
+ * look can change in one place. The primary green is casino felt, the
+ * destructive red that of the red suits.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: oklch(0.985 0.004 150);
+  --foreground: oklch(0.2 0.02 150);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2 0.02 150);
+  --primary: #15803d;
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.955 0.008 150);
+  --secondary-foreground: oklch(0.27 0.02 150);
+  --muted: oklch(0.955 0.008 150);
+  --muted-foreground: oklch(0.52 0.02 150);
+  --accent: oklch(0.955 0.008 150);
+  --accent-foreground: oklch(0.27 0.02 150);
+  --destructive: #ef4444;
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.88 0.01 150);
+  --input: oklch(0.7 0.015 150);
+  --ring: oklch(0.72 0.03 150);
+
+  --radius: 0.625rem;
+
+  --shadow-sm:
+    0 1px 2px -1px oklch(0.2 0.03 150 / 0.07),
+    0 2px 4px -1px oklch(0.2 0.03 150 / 0.07);
+  --shadow-2xl: 0 24px 50px -12px oklch(0.2 0.03 150 / 0.22);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-2xl: var(--shadow-2xl);
 }
 
 body {
