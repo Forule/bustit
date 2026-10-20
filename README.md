@@ -107,7 +107,8 @@ npm run db:reset
 
 ### Checks
 
-Type checking, linting, tests and formatting must pass before a change is done. The e2e tests run
+Type checking, linting, tests and formatting must pass before a change is done. Commit messages and
+other conventions are described in [CONTRIBUTING.md](./CONTRIBUTING.md). The e2e tests run
 against a throwaway Postgres in Docker.
 
 ```bash

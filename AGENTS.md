@@ -6,6 +6,10 @@ money. What it offers and how it works for its users is described in the
 Read them before working on a feature. This file is about how the code is
 built: structure, conventions and the decisions behind them.
 
+**Before writing a commit message, read [CONTRIBUTING.md](CONTRIBUTING.md)
+and follow its commit convention exactly.** It also lists the language rules
+and the checks a change has to pass. This file doesn't repeat them.
+
 ## Product Constraints
 
 - **Play money only**: The balance has no real-world value. Never add
@@ -335,8 +339,8 @@ folders themselves for that.
   services from `compose.dev.yaml`, such as the database, and then the dev
   servers on the host. The services keep running afterwards;
   `npm run services:stop` stops them.
-- Verify changes with `npm run typecheck`, `npm run lint`, `npm run test`,
-  `npm run test:e2e` and `npm run format` before considering a task done.
+- Run the checks listed in [CONTRIBUTING.md](CONTRIBUTING.md) before
+  considering a task done.
 
 ## Maintaining This File
 
@@ -359,6 +363,8 @@ Check this section before adding to it.
     `packages/<package>/docs/deployment.md`.
   - The discussion or reasoning that led to a change goes into the commit
     message.
+  - Conventions for contributing, such as the commit message format, go
+    into [CONTRIBUTING.md](CONTRIBUTING.md).
   - Lists of what exists, such as all modules or components, are read from
     the code itself.
 - **Change entries instead of appending**: If an entry covers the topic,
