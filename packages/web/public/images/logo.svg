@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs>
+  <mask id="bitten">
+    <rect width="512" height="512" fill="#fff"/>
+    <path d="M404 70 L446 108 L428 132 L444 160 L476 162 L500 100 L440 40 Z" fill="#000"/><path d="M44 336 L94 330 L108 364 L86 390 L104 426 L40 430 L20 350 Z" fill="#000"/><path d="M286 470 L306 438 L344 452 L350 500 L280 506 Z" fill="#000"/>
+  </mask>
+  <clipPath id="chip"><circle cx="256" cy="256" r="228"/></clipPath>
+  <clipPath id="l"><path d="M0 0 L256 0 L256 30 L244 120 L272 182 L236 250 L270 312 L256 372 L256 512 L0 512 Z"/></clipPath>
+  <clipPath id="r"><path d="M512 0 L256 0 L256 30 L244 120 L272 182 L236 250 L270 312 L256 372 L256 512 L512 512 Z"/></clipPath>
+  <linearGradient id="spadeShade" gradientUnits="userSpaceOnUse" x1="120" y1="100" x2="400" y2="460">
+    <stop offset="0.62" stop-color="#eee3c8"/><stop offset="0.62" stop-color="#cdbf9f"/>
+  </linearGradient>
+  <filter id="grime" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" seed="11"/>
+    <feColorMatrix values="0 0 0 0 0.03  0 0 0 0 0.04  0 0 0 0 0.03  0 0 0 2.2 -1.1"/>
+    <feComposite in2="SourceGraphic" operator="in"/>
+  </filter>
+  <filter id="speckle" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="1" seed="4"/>
+    <feColorMatrix values="0 0 0 0 0.02  0 0 0 0 0.03  0 0 0 0 0.02  0 0 0 9 -6.2"/>
+    <feComposite in2="SourceGraphic" operator="in"/>
+  </filter>
+  <radialGradient id="rimWeight" cx="0.5" cy="0.5" r="0.5">
+    <stop offset="0.55" stop-color="#fff" stop-opacity="0.25"/><stop offset="1" stop-color="#fff"/>
+  </radialGradient>
+</defs>
+<g transform="rotate(-10 256 256)" mask="url(#bitten)">
+  <!-- Body with a hard cel shadow and a warm rim light from the lamp above -->
+  <circle cx="256" cy="256" r="228" fill="#0e5527"/>
+  <g clip-path="url(#chip)">
+    <circle cx="236" cy="232" r="214" fill="#16873f"/>
+    <circle cx="256" cy="256" r="228" fill="none" stroke="#f7c46c" stroke-width="10" stroke-dasharray="300 1200" stroke-dashoffset="-900" opacity="0.8"/>
+    <rect x="233" y="26" width="46" height="70" rx="8" fill="#eee3c8" stroke="#0b0e0c" stroke-width="8" transform="rotate(22.5 256 256)"/><rect x="231" y="26" width="50" height="70" rx="8" fill="#eee3c8" stroke="#0b0e0c" stroke-width="8" transform="rotate(67.5 256 256)"/><rect x="229" y="26" width="54" height="70" rx="8" fill="#eee3c8" stroke="#0b0e0c" stroke-width="8" transform="rotate(112.5 256 256)"/><rect x="232" y="26" width="48" height="70" rx="8" fill="#eee3c8" stroke="#0b0e0c" stroke-width="8" transform="rotate(157.5 256 256)"/><rect x="230" y="26" width="52" height="70" rx="8" fill="#eee3c8" stroke="#0b0e0c" stroke-width="8" transform="rotate(202.5 256 256)"/><rect x="233" y="26" width="46" height="70" rx="8" fill="#eee3c8" stroke="#0b0e0c" stroke-width="8" transform="rotate(247.5 256 256)"/><rect x="231" y="26" width="50" height="70" rx="8" fill="#eee3c8" stroke="#0b0e0c" stroke-width="8" transform="rotate(292.5 256 256)"/><rect x="229" y="26" width="54" height="70" rx="8" fill="#eee3c8" stroke="#0b0e0c" stroke-width="8" transform="rotate(337.5 256 256)"/>
+    <path d="M150 120 L188 104" stroke="#7fd39b" stroke-width="4" stroke-linecap="round" opacity="0.55"/><path d="M372 360 L410 330" stroke="#7fd39b" stroke-width="4" stroke-linecap="round" opacity="0.55"/><path d="M120 300 L132 340" stroke="#7fd39b" stroke-width="4" stroke-linecap="round" opacity="0.55"/><path d="M210 440 L250 446" stroke="#7fd39b" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
+  </g>
+  <!-- Inner field -->
+  <circle cx="256" cy="256" r="166" fill="#101512" stroke="#0b0e0c" stroke-width="10"/>
+  <circle cx="256" cy="256" r="148" fill="none" stroke="#eee3c8" stroke-width="5" stroke-dasharray="14 12" opacity="0.7"/>
+  <g transform="translate(256 262) scale(0.5) translate(-256 -256)">
+    <g clip-path="url(#l)" transform="rotate(-5 256 372) translate(-8 0)"><path d="M256 56 C256 56 196 142 136 196 C96 232 72 266 72 306 C72 360 116 400 170 400 C206 400 234 384 248 362 C246 404 228 436 188 456 L324 456 C284 436 266 404 264 362 C278 384 306 400 342 400 C396 400 440 360 440 306 C440 266 416 232 376 196 C316 142 256 56 256 56 Z" fill="url(#spadeShade)"/></g>
+    <g clip-path="url(#r)" transform="rotate(5 256 372) translate(8 0)"><path d="M256 56 C256 56 196 142 136 196 C96 232 72 266 72 306 C72 360 116 400 170 400 C206 400 234 384 248 362 C246 404 228 436 188 456 L324 456 C284 436 266 404 264 362 C278 384 306 400 342 400 C396 400 440 360 440 306 C440 266 416 232 376 196 C316 142 256 56 256 56 Z" fill="url(#spadeShade)"/></g>
+    <path d="M248 366 C246 404 228 436 188 456 L324 456 C284 436 266 404 264 366 Z" fill="url(#spadeShade)"/>
+  </g>
+  <!-- Dirt over everything, then the outline on top -->
+  <circle cx="256" cy="256" r="228" fill="url(#rimWeight)" filter="url(#grime)" opacity="0.75"/>
+  <circle cx="256" cy="256" r="228" fill="url(#rimWeight)" filter="url(#speckle)"/>
+  <circle cx="256" cy="256" r="228" fill="none" stroke="#0b0e0c" stroke-width="12"/>
+</g>
+<!-- Outlines along the bites, drawn unmasked so the broken edges get ink too -->
+<g transform="rotate(-10 256 256)" clip-path="url(#chip)">
+  <path d="M404 70 L446 108 L428 132 L444 160 L476 162 L500 100 L440 40 Z" fill="none" stroke="#0b0e0c" stroke-width="10" stroke-linejoin="round"/><path d="M44 336 L94 330 L108 364 L86 390 L104 426 L40 430 L20 350 Z" fill="none" stroke="#0b0e0c" stroke-width="10" stroke-linejoin="round"/><path d="M286 470 L306 438 L344 452 L350 500 L280 506 Z" fill="none" stroke="#0b0e0c" stroke-width="10" stroke-linejoin="round"/>
+</g>
+</svg>

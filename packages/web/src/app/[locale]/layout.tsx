@@ -31,6 +31,14 @@ const bebasNeue = localFont({
  */
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
 };
 
 export function generateStaticParams() {
