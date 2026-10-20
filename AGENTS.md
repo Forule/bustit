@@ -29,7 +29,7 @@ place backbets on other players' seats, but never on their own seat.
 - **Server**: NestJS 12 (ESM) with Express, winston via `nest-winston`
 - **Web**: Next.js 16 (App Router) with React 19, Tailwind CSS v4, React Aria
   Components with `tailwindcss-react-aria-components`, `tailwind-variants`,
-  Formik with Zod, Lucide icons
+  Formik with Zod, `next-intl` (German and English), Lucide icons
 - **Database**: PostgreSQL 18, Drizzle ORM 0.45 with `node-postgres` via
   `@nestjs/drizzle`, `drizzle-kit` for migrations
 - **Auth**: Stateless bearer tokens signed with `jose`, passwords hashed with
@@ -66,9 +66,11 @@ place backbets on other players' seats, but never on their own seat.
 │   │   └── tests/              # Unit and e2e tests mirroring src/, shared test helpers in utils/
 │   └── web/                    # @bustit/web: Next.js client, UI only
 │       └── src/
-│           ├── app/            # Routes; (auth) holds login and registration
+│           ├── app/[locale]/   # Routes per locale; (auth) holds login and registration
 │           ├── components/     # Atomic Design: atoms, molecules, organisms, templates
+│           ├── i18n/           # Locales, routing, typed messages, locale-aware navigation
 │           └── lib/            # Helpers, e.g. the Formik binding for Zod
+│       └── messages/           # Translations: de.json (reference) and en.json
 ├── tsconfig.base.json          # Shared compiler options for engine, shared and server
 └── package.json                # Workspace scripts
 ```
@@ -256,13 +258,25 @@ place backbets on other players' seats, but never on their own seat.
   apply the rules from `@bustit/shared` (e.g. `USERNAME_PATTERN`,
   `PASSWORD_MIN_LENGTH`) with messages of their own, so rules aren't
   duplicated but the API's messages don't reach users.
-- **German UI**: The interface is in German. There is no translation layer
-  yet.
+- **i18n from the start**: The UI speaks German and English via
+  `next-intl`, following tarvello. Every route lives below `[locale]`; the
+  proxy sends requests without a locale to the detected one, German by
+  default. No UI string is hardcoded, validation messages included. Message
+  keys are typed against `de.json`, and `en.json` has to mirror it, so a
+  missing or misspelled key fails the typecheck. Messages are grouped by
+  `pages` and `components`; validation rules and errors used by several
+  forms live under `validation`.
+- **The locale is a root param**: `[locale]/layout.tsx` is the root layout,
+  so the locale comes from `next/root-params` (`currentLocale()`) instead of
+  the `params` prop. Pages don't read `params` for it, which keeps
+  navigations instant under Cache Components, and next-intl picks it up in
+  `i18n/request.ts` without `setRequestLocale`.
 - **Discreet entry pages**: Login and registration don't reveal what they
   belong to: no name or logo, no page description, neutral texts, and
   `noindex` for search engines.
-- **React Aria navigates through Next.js**: A `RouterProvider` in the root
-  layout makes React Aria links use the Next.js router.
+- **React Aria navigates through Next.js**: A `RouterProvider` in the locale
+  layout makes React Aria links use next-intl's router and puts the locale
+  into their `href`, so links are written without it, e.g. `/login`.
 
 ## Coding Principles
 

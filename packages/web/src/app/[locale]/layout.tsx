@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
+import { NextIntlClientProvider } from 'next-intl';
 import { Geist, Geist_Mono } from 'next/font/google';
-import { Providers } from './providers';
-import './globals.css';
+import { currentLocale } from '@/i18n/locale';
+import { routing } from '@/i18n/routing';
+import { Providers } from '../providers';
+import '../globals.css';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -21,14 +24,25 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function RootLayout({ children }: LayoutProps<'/'>) {
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+/** The root layout; it sits below `[locale]` so the locale is a root param. */
+export default async function LocaleLayout({
+  children,
+}: LayoutProps<'/[locale]'>) {
+  const locale = await currentLocale();
+
   return (
     <html
-      lang="de"
+      lang={locale}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col font-sans">
-        <Providers>{children}</Providers>
+        <NextIntlClientProvider>
+          <Providers locale={locale}>{children}</Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

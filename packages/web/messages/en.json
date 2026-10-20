@@ -1,0 +1,54 @@
+{
+  "pages": {
+    "login": {
+      "seo": {
+        "title": "Sign in"
+      },
+      "title": "Welcome back",
+      "description": "Sign in with your account.",
+      "noAccount": "No account yet?",
+      "toRegister": "Sign up with an invite"
+    },
+    "register": {
+      "seo": {
+        "title": "Sign up"
+      },
+      "title": "Create an account",
+      "description": "Signing up is by invitation only.",
+      "hasAccount": "Already in?",
+      "toLogin": "Sign in"
+    }
+  },
+  "components": {
+    "loginForm": {
+      "username": "Username",
+      "password": "Password",
+      "submit": "Sign in",
+      "errors": {
+        "usernameRequired": "Please enter your username.",
+        "passwordRequired": "Please enter your password."
+      }
+    },
+    "registerForm": {
+      "inviteCode": "Invite code",
+      "inviteCodePlaceholder": "BJ-XXXX-XXXX-XXXX",
+      "username": "Username",
+      "password": "Password",
+      "passwordConfirmation": "Repeat password",
+      "submit": "Create account",
+      "errors": {
+        "inviteCodeRequired": "Please enter your invite code."
+      }
+    }
+  },
+  "validation": {
+    "rules": {
+      "username": "3 to 20 characters: letters, digits and underscores.",
+      "password": "At least {min} characters."
+    },
+    "errors": {
+      "tooLong": "At most {max} characters.",
+      "passwordsDiffer": "The passwords don't match."
+    }
+  }
+}

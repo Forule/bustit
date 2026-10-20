@@ -1,0 +1,54 @@
+{
+  "pages": {
+    "login": {
+      "seo": {
+        "title": "Anmelden"
+      },
+      "title": "Willkommen zurück",
+      "description": "Melde dich mit deinem Konto an.",
+      "noAccount": "Noch kein Konto?",
+      "toRegister": "Mit Einladung registrieren"
+    },
+    "register": {
+      "seo": {
+        "title": "Registrieren"
+      },
+      "title": "Konto erstellen",
+      "description": "Die Registrierung ist nur mit Einladung möglich.",
+      "hasAccount": "Schon dabei?",
+      "toLogin": "Anmelden"
+    }
+  },
+  "components": {
+    "loginForm": {
+      "username": "Benutzername",
+      "password": "Passwort",
+      "submit": "Anmelden",
+      "errors": {
+        "usernameRequired": "Bitte gib deinen Benutzernamen ein.",
+        "passwordRequired": "Bitte gib dein Passwort ein."
+      }
+    },
+    "registerForm": {
+      "inviteCode": "Einladungscode",
+      "inviteCodePlaceholder": "BJ-XXXX-XXXX-XXXX",
+      "username": "Benutzername",
+      "password": "Passwort",
+      "passwordConfirmation": "Passwort wiederholen",
+      "submit": "Konto erstellen",
+      "errors": {
+        "inviteCodeRequired": "Bitte gib deinen Einladungscode ein."
+      }
+    }
+  },
+  "validation": {
+    "rules": {
+      "username": "3 bis 20 Zeichen: Buchstaben, Ziffern und Unterstriche.",
+      "password": "Mindestens {min} Zeichen."
+    },
+    "errors": {
+      "tooLong": "Höchstens {max} Zeichen.",
+      "passwordsDiffer": "Die Passwörter stimmen nicht überein."
+    }
+  }
+}

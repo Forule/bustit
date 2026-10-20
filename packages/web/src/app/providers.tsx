@@ -1,7 +1,9 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import type { Locale } from 'next-intl';
+import { I18nProvider } from 'react-aria-components/I18nProvider';
 import { RouterProvider } from 'react-aria-components';
+import { getPathname, useRouter } from '@/i18n/navigation';
 
 declare module 'react-aria-components' {
   interface RouterConfig {
@@ -12,15 +14,28 @@ declare module 'react-aria-components' {
 }
 
 /**
- * Lets react-aria links and buttons with an `href` navigate through the
- * Next.js router instead of reloading the page.
+ * React Aria formats for the page's locale, and its links and buttons with an
+ * `href` navigate through the locale-aware Next.js router. `useHref` puts the
+ * locale into the rendered `href` as well, so opening a link in a new tab
+ * keeps the language.
  */
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({
+  locale,
+  children,
+}: {
+  locale: Locale;
+  children: React.ReactNode;
+}) {
   const router = useRouter();
 
   return (
-    <RouterProvider navigate={(href, options) => router.push(href, options)}>
-      {children}
-    </RouterProvider>
+    <I18nProvider locale={locale}>
+      <RouterProvider
+        navigate={(href, options) => router.push(href, options)}
+        useHref={(href) => getPathname({ href, locale })}
+      >
+        {children}
+      </RouterProvider>
+    </I18nProvider>
   );
 }

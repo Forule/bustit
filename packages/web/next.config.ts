@@ -1,5 +1,6 @@
 import path from 'node:path';
 import type { NextConfig } from 'next';
+import createNextIntlPlugin from 'next-intl/plugin';
 
 const isStandalone = process.env.NEXT_OUTPUT_MODE === 'standalone';
 const isDevelopment = process.env.NODE_ENV === 'development';
@@ -37,4 +38,6 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+const withNextIntl = createNextIntlPlugin();
+
+export default withNextIntl(nextConfig);
