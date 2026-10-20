@@ -109,3 +109,12 @@ npm run format
 
 Keep each commit focused on one change. Unrelated changes, such as a refactoring noticed on the way,
 go into a commit of their own.
+
+## Work in Small Increments
+
+- **Small, reviewable changes**: Break features into small, independently understandable and verifiable
+  work packages. Commit working intermediate states instead of implementing an entire feature in one large
+  change. Each commit should represent a coherent step and follow the repository's commit message convention.
+- **Feature-focused pull requests**: Open pull requests for individual features or clearly scoped parts
+  of a feature. Keep them small enough to review and test effectively. Run the required checks before
+  requesting review, and avoid mixing unrelated changes into the same pull request.

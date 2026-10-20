@@ -230,6 +230,19 @@ folders themselves for that.
   codes fail alike. An invite's status is derived in the database, so expiry
   is judged by the same clock everywhere.
 
+### API Boundaries
+
+- **HTTP for management, Socket.IO for live gameplay**: RESTful HTTP endpoints
+  handle request-response operations such as registration, login, user profile and
+  master-data retrieval, and other management tasks. Real-time gameplay uses a Socket.IO
+  interface over WebSocket for player actions and game-state updates. The WebSocket
+  connection is authenticated and authorized independently of the HTTP session. Since
+  the browser's native WebSocket API does not support custom authorization headers,
+  the connection is established using a short-lived, single-use connection ticket
+  obtained through an authenticated HTTP request. Tickets are transmitted during
+  the Socket.IO handshake, validated server-side and rejected after use or expiry.
+  Sensitive credentials are never placed in long-lived query parameters.
+
 ### Web
 
 - **Browsers only talk to the web app (BFF)**: The game server's HTTP API is
