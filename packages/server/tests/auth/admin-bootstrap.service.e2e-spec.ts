@@ -17,11 +17,11 @@ describe('AdminBootstrapService', () => {
 
   beforeAll(async () => {
     app = await createTestApp();
-    config = app.module.get(ConfigService);
+    config = app.get(ConfigService);
   });
 
   afterAll(async () => {
-    await app.module.close();
+    await app.close();
   });
 
   it('creates the admin from the environment with the starting balance', async () => {
@@ -37,7 +37,7 @@ describe('AdminBootstrapService', () => {
   });
 
   it('leaves an existing admin alone on the next start', async () => {
-    await app.module.get(AdminBootstrapService).onApplicationBootstrap();
+    await app.get(AdminBootstrapService).onApplicationBootstrap();
 
     expect(
       await app.db.select().from(users).where(eq(users.role, 'admin')),

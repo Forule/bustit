@@ -20,12 +20,12 @@ describe('InvitesService', () => {
 
   beforeAll(async () => {
     app = await createTestApp();
-    service = app.module.get(InvitesService);
+    service = app.get(InvitesService);
     adminId = (await getAdmin(app)).id;
   });
 
   afterAll(async () => {
-    await app.module.close();
+    await app.close();
   });
 
   async function inviteOf(code: string) {

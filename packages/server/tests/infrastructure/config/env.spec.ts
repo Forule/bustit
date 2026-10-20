@@ -4,6 +4,7 @@ import { validateEnv } from '../../../src/infrastructure/config/env.js';
 const required = {
   NODE_ENV: 'test',
   DATABASE_URL: 'postgres://user:password@localhost:5432/bustit',
+  JWT_SECRET: 'a'.repeat(32),
   ADMIN_USERNAME: 'admin',
   ADMIN_PASSWORD: 'admin-password',
 };
@@ -41,6 +42,7 @@ describe('validateEnv', () => {
     ['a negative starting balance', { ...required, STARTING_BALANCE: '-5' }],
     ['a fractional starting balance', { ...required, STARTING_BALANCE: '1.5' }],
     ['zero invite validity days', { ...required, INVITE_VALIDITY_DAYS: '0' }],
+    ['a short jwt secret', { ...required, JWT_SECRET: 'a'.repeat(31) }],
     ['an unknown log level', { ...required, LOG_LEVEL: 'trace' }],
     ['an invalid admin username', { ...required, ADMIN_USERNAME: 'a b' }],
     ['a short admin password', { ...required, ADMIN_PASSWORD: 'short' }],

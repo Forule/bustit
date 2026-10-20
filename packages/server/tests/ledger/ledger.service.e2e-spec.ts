@@ -18,11 +18,11 @@ describe('LedgerService', () => {
 
   beforeAll(async () => {
     app = await createTestApp();
-    service = app.module.get(LedgerService);
+    service = app.get(LedgerService);
   });
 
   afterAll(async () => {
-    await app.module.close();
+    await app.close();
   });
 
   async function balanceOf(userId: string): Promise<number> {

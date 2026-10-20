@@ -13,11 +13,11 @@ describe('AccountService', () => {
 
   beforeAll(async () => {
     app = await createTestApp();
-    service = app.module.get(AccountService);
+    service = app.get(AccountService);
   });
 
   afterAll(async () => {
-    await app.module.close();
+    await app.close();
   });
 
   async function findUser(username: string) {

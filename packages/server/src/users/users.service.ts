@@ -20,6 +20,20 @@ export type NewUser = {
 export class UsersService {
   constructor(@InjectDrizzle() private readonly db: Database) {}
 
+  async findById(id: string): Promise<User | null> {
+    const [user] = await this.db.select().from(users).where(eq(users.id, id));
+    return user ?? null;
+  }
+
+  /** Expects the normalized username, see `usernameSchema`. */
+  async findByUsername(username: string): Promise<User | null> {
+    const [user] = await this.db
+      .select()
+      .from(users)
+      .where(eq(users.username, username));
+    return user ?? null;
+  }
+
   async hasAdmin(tx?: Transaction): Promise<boolean> {
     const [admin] = await (tx ?? this.db)
       .select({ id: users.id })

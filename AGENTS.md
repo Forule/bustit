@@ -30,7 +30,8 @@ place backbets on other players' seats, but never on their own seat.
 - **Web**: Next.js 16 (App Router) with React 19, Tailwind CSS v4
 - **Database**: PostgreSQL 18, Drizzle ORM 0.45 with `node-postgres` via
   `@nestjs/drizzle`, `drizzle-kit` for migrations
-- **Passwords**: argon2id (`argon2`)
+- **Auth**: Stateless bearer tokens signed with `jose`, passwords hashed with
+  argon2id (`argon2`)
 - **Validation**: Zod
 - **Testing**: Vitest, Supertest, Testcontainers (Postgres)
 - **Tooling**: ESLint 9 (flat config per package), Prettier (repository root)
@@ -50,12 +51,13 @@ place backbets on other players' seats, but never on their own seat.
 │   ├── shared/                 # @bustit/shared: Zod schemas and types for server and web
 │   ├── server/                 # @bustit/server: NestJS game server
 │   │   ├── src/
-│   │   │   ├── auth/           # Account creation, password hashing, admin bootstrap
-│   │   │   ├── infrastructure/ # Technical concerns: config, database, logging, health
+│   │   │   ├── auth/           # Login, auth tokens, auth guard, accounts, admin bootstrap
+│   │   │   ├── infrastructure/ # Technical concerns: config, database, logging, health, validation
 │   │   │   ├── invites/        # Invite codes and registration with them
 │   │   │   ├── ledger/         # Bookings, the only way to change a balance
 │   │   │   ├── users/          # User table
 │   │   │   ├── app.module.ts
+│   │   │   ├── app.setup.ts    # App setup shared by main.ts and the e2e tests
 │   │   │   └── main.ts
 │   │   ├── drizzle/            # Generated migrations, committed
 │   │   ├── drizzle.config.ts   # drizzle-kit config
@@ -172,6 +174,24 @@ place backbets on other players' seats, but never on their own seat.
 - **Ids are UUIDv7, amounts are integers**: Primary keys default to
   Postgres' `uuidv7()`, which sorts by creation time. Amounts are whole chips
   stored as `bigint`.
+- **The API is stateless and uses no cookies**: Login returns a signed
+  token in the response body, and clients send it as
+  `Authorization: Bearer <token>`, so browsers, mobile apps and other clients
+  use the API alike. The server keeps no login state. The web app holds its
+  own session (next-auth) and keeps the token there.
+- **Tokens are checked against the database**: A token only carries the user
+  id and the token version. On every request the guard loads the user,
+  rejects disabled ones and those whose token version changed, and reads the
+  role from the database. Raising `tokenVersion` ends all logins of a user.
+- **Every route requires a login unless marked `@Public()`**: A global guard
+  checks the token on every request, so a new route is protected without
+  anyone remembering to.
+- **Login reveals nothing about accounts**: Unknown users, wrong passwords and
+  disabled accounts get the same answer, and unknown users are checked
+  against a dummy hash so the response time doesn't tell them apart.
+- **Request bodies are validated with the shared schemas**: Controllers parse
+  input with `ZodValidationPipe` and the Zod schemas from `@bustit/shared`,
+  which the web client uses as well.
 - **Accounts start with a booking**: `AccountService.create` creates the
   user and books the starting balance in one transaction. On startup the
   first admin is created from `ADMIN_USERNAME` and `ADMIN_PASSWORD` unless an

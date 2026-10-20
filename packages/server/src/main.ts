@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module.js';
+import { configureApp } from './app.setup.js';
 import type { Env } from './infrastructure/config/index.js';
 import { createLogger } from './infrastructure/logging/index.js';
 
@@ -26,7 +27,7 @@ async function bootstrap() {
 
   const port = configService.get('PORT', { infer: true });
 
-  app.setGlobalPrefix('api');
+  configureApp(app);
   app.enableShutdownHooks();
 
   await app.listen(port);

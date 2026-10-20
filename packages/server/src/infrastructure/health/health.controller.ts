@@ -7,12 +7,14 @@ import {
 import { InjectDrizzle } from '@nestjs/drizzle';
 import type { HealthResponse } from '@bustit/shared';
 import { sql } from 'drizzle-orm';
+import { Public } from '../../auth/public.js';
 import type { Database } from '../database/index.js';
 
 /**
  * Reports the server as healthy only while it can reach the database, since
  * it can't serve anything without it.
  */
+@Public()
 @Controller('health')
 export class HealthController {
   private readonly logger = new Logger(HealthController.name);

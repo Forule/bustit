@@ -13,6 +13,8 @@ export const envSchema = z.object({
   STARTING_BALANCE: z.coerce.number().int().positive().default(1000),
   /** Days an invite code can be redeemed after it was created. */
   INVITE_VALIDITY_DAYS: z.coerce.number().int().positive().default(7),
+  /** Signs auth tokens. At least 32 characters, random in production. */
+  JWT_SECRET: z.string().min(32),
   /** Created as admin on startup unless an admin exists already. */
   ADMIN_USERNAME: usernameSchema,
   ADMIN_PASSWORD: passwordSchema,

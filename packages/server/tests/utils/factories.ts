@@ -21,7 +21,7 @@ export function uniqueUsername(): string {
 
 /** A player with the starting balance. */
 export function createPlayer(app: TestApp): Promise<User> {
-  return app.module.get(AccountService).create({
+  return app.get(AccountService).create({
     username: uniqueUsername(),
     password: TEST_PASSWORD,
     role: 'player',

@@ -1,33 +1,56 @@
+import type { INestApplication, Type } from '@nestjs/common';
 import { getDrizzleToken } from '@nestjs/drizzle';
-import { Test, type TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { sql } from 'drizzle-orm';
+import type { App } from 'supertest/types.js';
 import { AppModule } from '../../src/app.module.js';
+import { configureApp } from '../../src/app.setup.js';
 import type { Database } from '../../src/infrastructure/database/index.js';
 import { InvitesModule } from '../../src/invites/index.js';
 import { LedgerModule } from '../../src/ledger/index.js';
 
 export type TestApp = {
-  readonly module: TestingModule;
   readonly db: Database;
+  /** The HTTP server, to send requests to with supertest. */
+  readonly http: App;
+  get<T>(type: Type<T>): T;
+  close(): Promise<void>;
+};
+
+export type TestAppOptions = {
+  /** Extra controllers, e.g. to exercise guards on routes of a test's own. */
+  readonly controllers?: Type[];
 };
 
 /**
- * The app with every feature module, started against an emptied e2e
- * database. Its startup hooks run as in production, so afterwards the
- * database holds exactly the admin with its starting balance.
+ * The app with every feature module, set up as in `main.ts` and started
+ * against an emptied e2e database. Its startup hooks run as in production,
+ * so afterwards the database holds exactly the admin with its starting
+ * balance.
  */
-export async function createTestApp(): Promise<TestApp> {
+export async function createTestApp(
+  options: TestAppOptions = {},
+): Promise<TestApp> {
   const module = await Test.createTestingModule({
     imports: [AppModule, LedgerModule, InvitesModule],
+    controllers: options.controllers ?? [],
   }).compile();
   const db: Database = module.get(getDrizzleToken());
 
   await emptyDatabase(db);
 
-  module.useLogger(false);
-  await module.init();
+  const app: INestApplication<App> = module.createNestApplication({
+    logger: false,
+  });
+  configureApp(app);
+  await app.init();
 
-  return { module, db };
+  return {
+    db,
+    http: app.getHttpServer(),
+    get: (type) => app.get(type),
+    close: () => app.close(),
+  };
 }
 
 /**

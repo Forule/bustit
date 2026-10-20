@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { passwordSchema, usernameSchema } from '../src/auth.js';
+import {
+  loginRequestSchema,
+  passwordSchema,
+  usernameSchema,
+} from '../src/auth.js';
 
 describe('usernameSchema', () => {
   it('normalizes to trimmed lower case', () => {
@@ -22,5 +26,19 @@ describe('passwordSchema', () => {
 
   it.each([9, 257])('rejects %i characters', (length) => {
     expect(passwordSchema.safeParse('a'.repeat(length)).success).toBe(false);
+  });
+});
+
+describe('loginRequestSchema', () => {
+  it('normalizes the username without validating it', () => {
+    expect(
+      loginRequestSchema.parse({ username: ' A b ', password: 'x' }),
+    ).toEqual({ username: 'a b', password: 'x' });
+  });
+
+  it('rejects a missing password', () => {
+    expect(loginRequestSchema.safeParse({ username: 'admin' }).success).toBe(
+      false,
+    );
   });
 });
