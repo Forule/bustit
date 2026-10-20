@@ -3,34 +3,37 @@
 
 /*
  * Design tokens. Components use only these, never raw palette colors, so the
- * look can change in one place. The primary green is casino felt, the
- * destructive red that of the red suits.
+ * look can change in one place. The app is dark only, so there is no light
+ * set. The primary green is casino felt, the destructive red that of the red
+ * suits. The card is translucent so that it lets the scenes behind it show
+ * through as frosted glass.
  */
 :root {
-  --background: oklch(0.985 0.004 150);
-  --foreground: oklch(0.2 0.02 150);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.02 150);
+  color-scheme: dark;
+
+  --background: oklch(0.145 0.01 150);
+  --foreground: oklch(0.96 0.005 150);
+  --card: oklch(0.17 0.012 150 / 0.55);
+  --card-foreground: oklch(0.96 0.005 150);
   --primary: #15803d;
   --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.955 0.008 150);
-  --secondary-foreground: oklch(0.27 0.02 150);
-  --muted: oklch(0.955 0.008 150);
-  --muted-foreground: oklch(0.52 0.02 150);
-  --accent: oklch(0.955 0.008 150);
-  --accent-foreground: oklch(0.27 0.02 150);
+  --secondary: oklch(0.26 0.012 150);
+  --secondary-foreground: oklch(0.96 0.005 150);
+  --muted: oklch(0.26 0.012 150);
+  --muted-foreground: oklch(0.74 0.015 150);
+  --accent: oklch(0.26 0.012 150);
+  --accent-foreground: oklch(0.96 0.005 150);
   --destructive: #ef4444;
   --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.88 0.01 150);
-  --input: oklch(0.7 0.015 150);
-  --ring: oklch(0.72 0.03 150);
+  --border: oklch(1 0 0 / 0.12);
+  --input: oklch(1 0 0 / 0.22);
+  --ring: oklch(1 0 0 / 0.45);
 
   --radius: 0.625rem;
 
   --shadow-sm:
-    0 1px 2px -1px oklch(0.2 0.03 150 / 0.07),
-    0 2px 4px -1px oklch(0.2 0.03 150 / 0.07);
-  --shadow-2xl: 0 24px 50px -12px oklch(0.2 0.03 150 / 0.22);
+    0 1px 2px -1px oklch(0 0 0 / 0.3), 0 2px 4px -1px oklch(0 0 0 / 0.3);
+  --shadow-2xl: 0 24px 50px -12px oklch(0 0 0 / 0.6);
 }
 
 @theme inline {
