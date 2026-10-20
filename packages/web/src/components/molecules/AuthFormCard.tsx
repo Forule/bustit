@@ -13,7 +13,8 @@ export function AuthFormCard({
   footer,
 }: AuthFormCardProps) {
   return (
-    <div className="flex w-full max-w-md flex-col gap-8 rounded-3xl border border-border bg-card p-8 shadow-2xl backdrop-blur-xl sm:p-10">
+    // On wide screens AuthTemplate stretches it into a full-height side panel.
+    <div className="flex w-full max-w-md flex-col gap-8 rounded-3xl border border-border bg-card p-8 shadow-2xl backdrop-blur-xl sm:p-10 xl:max-w-none xl:justify-center xl:rounded-none xl:border-y-0 xl:border-l-0 xl:px-12">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-extrabold tracking-tight text-card-foreground">
           {title}
