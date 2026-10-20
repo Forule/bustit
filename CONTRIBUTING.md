@@ -118,3 +118,19 @@ go into a commit of their own.
 - **Feature-focused pull requests**: Open pull requests for individual features or clearly scoped parts
   of a feature. Keep them small enough to review and test effectively. Run the required checks before
   requesting review, and avoid mixing unrelated changes into the same pull request.
+
+## Testing
+
+- **Testable by design**: All application logic must be testable. Keep business logic independent
+  of infrastructure where practical, inject external dependencies and avoid unnecessary coupling
+  that makes tests difficult to write or maintain.
+- **Unit tests for isolated logic**: Add unit tests for business rules, calculations, validation
+  and other logic that can be tested without external services. Unit tests should be fast and deterministic.
+- **End-to-end tests for integration boundaries**: Add e2e tests when behavior depends on interactions
+  between modules, HTTP endpoints, authentication and authorization, database transactions or other
+  infrastructure. Use the real dependencies specified by the project test setup rather than replacing them with mocks.
+- **Test the relevant behavior**: Every change should include or update tests appropriate to its scope.
+  Bug fixes should include a regression test where practical. Do not add tests solely to increase coverage;
+  test meaningful behavior, important edge cases and failure conditions.
+- **Run required checks**: Run the checks defined in `CONTRIBUTING.md` before considering a task complete
+  or requesting review.
