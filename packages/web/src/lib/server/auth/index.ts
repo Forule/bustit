@@ -1,7 +1,7 @@
 import { loginRequestSchema, type UserProfile } from '@bustit/shared';
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-import { login } from '@/lib/server/api';
+import { login } from '../api';
 
 type Role = UserProfile['role'];
 

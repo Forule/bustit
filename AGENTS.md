@@ -73,8 +73,8 @@ place backbets on other players' seats, but never on their own seat.
 │           ├── components/     # Atomic Design: atoms, molecules, organisms, templates
 │           ├── i18n/           # Locales, routing, typed messages, locale-aware navigation
 │           ├── lib/            # Helpers, e.g. the Formik binding for Zod
-│           │   └── server/     # Server-only: env, the game server's API client in api/
-│           └── auth.ts         # next-auth: session cookie with the server's token
+│           │   └── server/     # Server-only: env, the game server's API client (api/), next-auth (auth/)
+│           └── proxy.ts        # Locale redirects and the login guard
 │       └── messages/           # Translations: de.json (reference) and en.json
 ├── tsconfig.base.json          # Shared compiler options for engine, shared and server
 └── package.json                # Workspace scripts
@@ -294,6 +294,11 @@ place backbets on other players' seats, but never on their own seat.
   HTTP-only session cookie and never reaches browser code: the session the
   browser sees has the user's id, name and role only. A session ends when
   the token it holds expires.
+- **Every page requires a login unless public**: The proxy sends requests
+  without a session to the login, except for the pages listed as public
+  (login and registration). Like the server's global guard, a new page is
+  protected without anyone remembering to. The check only reads the session
+  cookie; the game server still checks the token on every call.
 - **React Aria navigates through Next.js**: A `RouterProvider` in the locale
   layout makes React Aria links use next-intl's router and puts the locale
   into their `href`, so links are written without it, e.g. `/login`.

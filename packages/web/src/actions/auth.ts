@@ -2,7 +2,7 @@
 
 import type { LoginRequest } from '@bustit/shared';
 import { AuthError } from 'next-auth';
-import { signIn } from '@/auth';
+import { signIn } from '@/lib/server/auth';
 
 export type LoginResult = { success: true } | { error: 'invalidCredentials' };
 
