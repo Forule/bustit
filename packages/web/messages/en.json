@@ -41,6 +41,13 @@
       "errors": {
         "inviteCodeRequired": "Please enter your invite code."
       }
+    },
+    "navbar": {
+      "home": "Home",
+      "logout": "Sign out"
+    },
+    "footer": {
+      "copyright": "© 2026 bustit"
     }
   },
   "validation": {

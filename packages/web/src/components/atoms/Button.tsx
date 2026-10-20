@@ -10,7 +10,7 @@ import { focusRing } from './utils';
 
 export interface ButtonProps extends RACButtonProps {
   /** @default 'primary' */
-  variant?: 'primary' | 'secondary' | 'destructive';
+  variant?: 'primary' | 'secondary' | 'destructive' | 'icon';
 }
 
 const button = tv({
@@ -24,6 +24,7 @@ const button = tv({
         'border-border bg-secondary text-secondary-foreground hover:bg-secondary/80 pressed:bg-secondary/60',
       destructive:
         'bg-destructive text-destructive-foreground hover:bg-destructive/90 pressed:bg-destructive/80',
+      icon: 'h-fit w-fit rounded-md border-none bg-transparent p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground pressed:bg-accent/80',
     },
     isDisabled: {
       true: 'cursor-default bg-muted text-muted-foreground forced-colors:text-[GrayText]',
@@ -32,6 +33,13 @@ const button = tv({
       true: 'cursor-default text-transparent',
     },
   },
+  compoundVariants: [
+    {
+      variant: 'icon',
+      isDisabled: true,
+      class: 'bg-transparent',
+    },
+  ],
   defaultVariants: {
     variant: 'primary',
   },

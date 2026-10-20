@@ -2,7 +2,7 @@
 
 import type { LoginRequest } from '@bustit/shared';
 import { AuthError } from 'next-auth';
-import { signIn } from '@/lib/server/auth';
+import { signIn, signOut } from '@/lib/server/auth';
 
 export type LoginResult = { success: true } | { error: 'invalidCredentials' };
 
@@ -23,4 +23,9 @@ export async function loginAction(data: LoginRequest): Promise<LoginResult> {
   }
 
   return { success: true };
+}
+
+/** Ends the session; the caller navigates to the login afterwards. */
+export async function logoutAction(): Promise<void> {
+  await signOut({ redirect: false });
 }
